@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 class ProductCard extends StatelessWidget {
   final Map<String, dynamic> product;
 
@@ -97,3 +96,4 @@ class ProductCard extends StatelessWidget {
     );
   }
 }
+

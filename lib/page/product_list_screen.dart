@@ -1,39 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_doanlt/page/filter_screen.dart';
 import 'package:flutter_doanlt/page/product_card.dart';
 
 class ProductListScreen extends StatelessWidget {
   final List<Map<String, dynamic>> products = [
     {
       'title': 'Nike Air Force',
-      'price': 367.76,
-      'label': 'BEST SELLER',
+      'price': 367000,
+      'label': 'THỊNH HÀNH',
       'image': 'assets/nike_air_force.png',
-      'gender': 'Men\'s shoes',
+      'gender': 'Giày Nam',
       'colors': [Colors.blue, Colors.green, Colors.grey],
     },
     {
       'title': 'Nike Air Cadir',
-      'price': 259.87,
-      'label': 'NEW ARRIVAL',
+      'price': 259000,
+      'label': 'HÀNG MỚI',
       'image': 'assets/nike_air_cadir.png',
-      'gender': 'Women\'s shoes',
+      'gender': 'Giày Nữ',
       'colors': [Colors.blue, Colors.red],
-    },
-    {
-      'title': 'Nike Jordan',
-      'price': 58.7,
-      'label': 'LIMITED EDITION',
-      'image': 'assets/nike_jordan.png',
-      'gender': 'Men\'s shoes',
-      'colors': [Colors.blue, Colors.green, Colors.grey],
-    },
-    {
-      'title': 'Nike Air Max',
-      'price': 95.73,
-      'label': 'TRENDING NOW',
-      'image': 'assets/nike_air_max.png',
-      'gender': 'Women\'s shoes',
-      'colors': [Colors.blue, Colors.grey],
     },
     {
       'title': 'Nike Club Max',
@@ -57,9 +42,8 @@ class ProductListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue,
         elevation: 0,
-        title: Text('All shoes', style: TextStyle(color: Colors.white)),
+        title: Text('Giày Nike', style: TextStyle(color: Colors.white)),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {},
@@ -71,12 +55,21 @@ class ProductListScreen extends StatelessWidget {
           ),
           IconButton(
             icon: Icon(Icons.filter_list, color: Colors.white),
-            onPressed: () {},
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                builder: (context) => FilterScreen(),
+              );
+            },
           ),
         ],
       ),
       body: Container(
-        color: Colors.blue,
+        color: Color(0xFF6699CC),
         child: GridView.builder(
           padding: EdgeInsets.all(10.0),
           itemCount: products.length,
@@ -84,14 +77,14 @@ class ProductListScreen extends StatelessWidget {
             crossAxisCount: 2,
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
-            childAspectRatio: 0.7,
+            childAspectRatio: 0.75,
           ),
           itemBuilder: (context, index) {
             return ProductCard(product: products[index]);
           },
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
+   bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         items: [
           BottomNavigationBarItem(

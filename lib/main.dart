@@ -8,7 +8,6 @@ void main() {
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -21,7 +20,13 @@ class ShoeApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
+       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        scaffoldBackgroundColor: Color(0xFF6699CC),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Color(0xFF6699CC),
+        ),
+      ),
       home: ProductListScreen(),
     );
   }
