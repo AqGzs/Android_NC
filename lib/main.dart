@@ -1,20 +1,19 @@
-import 'package:flutter/material.dart';
-
+ import 'package:flutter/material.dart';
+import 'package:flutter_doanlt/detail/productDetailScreen.dart';
+import 'package:flutter_doanlt/favorite/favorite.dart';
+import 'package:flutter_doanlt/notification/notification.dart';
 void main() {
-  runApp(const MainApp());
+  runApp(MyApp());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
-
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
+    return MaterialApp(
+      theme: ThemeData(
+        primaryColor:  Color(0xFF6699CC),// Define your primary color here
       ),
+      home: favorite(),
     );
   }
 }
