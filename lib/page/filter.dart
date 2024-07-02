@@ -1,35 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; 
-
-
-class FilterScreen extends StatelessWidget {
-  void _showFilterSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return FilterSheet();
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Filter Example'),
-      ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            _showFilterSheet(context);
-          },
-          child: Text('Open Filter'),
-        ),
-      ),
-    );
-  }
-}
-
 class FilterSheet extends StatefulWidget {
   @override
   _FilterSheetState createState() => _FilterSheetState();
@@ -40,6 +10,7 @@ class _FilterSheetState extends State<FilterSheet> {
   int size = 41;
   RangeValues priceRange = RangeValues(50000, 350000);
   final NumberFormat currencyFormatter = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
+
   void resetFilters() {
     setState(() {
       gender = 'Nam';
@@ -68,8 +39,8 @@ class _FilterSheetState extends State<FilterSheet> {
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               TextButton(
-                onPressed:resetFilters ,
-                child: Text('Đặt lại', style: TextStyle(fontSize: 16,color: Colors.grey)),
+                onPressed: resetFilters,
+                child: Text('Đặt lại', style: TextStyle(fontSize: 16, color: Colors.grey)),
               ),
             ],
           ),
@@ -159,10 +130,11 @@ class _FilterSheetState extends State<FilterSheet> {
               minimumSize: Size(double.infinity, 50),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
             ),
-            child: Text('Lọc',style: TextStyle(fontSize: 18,color: Colors.white)),
+            child: Text('Lọc', style: TextStyle(fontSize: 18, color: Colors.white)),
           ),
         ],
       ),
     );
   }
 }
+

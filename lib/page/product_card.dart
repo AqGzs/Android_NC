@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 class ProductCard extends StatelessWidget {
   final Map<String, dynamic> product;
 
@@ -18,8 +19,9 @@ class ProductCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(10.0),
-                    topRight: Radius.circular(10.0)),
+                  topLeft: Radius.circular(10.0),
+                  topRight: Radius.circular(10.0),
+                ),
                 child: Image.asset(
                   product['image'],
                   height: 100,
@@ -68,7 +70,7 @@ class ProductCard extends StatelessWidget {
                 ),
                 SizedBox(height: 8.0),
                 Text(
-                  '\$${product['price']}',
+                  '${product['price']}đ',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -76,13 +78,13 @@ class ProductCard extends StatelessWidget {
                 ),
                 SizedBox(height: 8.0),
                 Row(
-                  children: product['colors'].map<Widget>((color) {
+                  children: (product['colors'] as List).map<Widget>((color) {
                     return Container(
                       margin: EdgeInsets.only(right: 4.0),
                       width: 12,
                       height: 12,
                       decoration: BoxDecoration(
-                        color: color,
+                        color: _getColorFromName(color),
                         shape: BoxShape.circle,
                       ),
                     );
@@ -95,5 +97,23 @@ class ProductCard extends StatelessWidget {
       ),
     );
   }
+
+  Color _getColorFromName(String colorName) {
+    switch (colorName) {
+      case 'blue':
+        return Colors.blue;
+      case 'green':
+        return Colors.green;
+      case 'grey':
+        return Colors.grey;
+      case 'red':
+        return Colors.red;
+      case 'orange':
+        return Colors.orange;
+      default:
+        return Colors.black;
+    }
+  }
 }
+
 
