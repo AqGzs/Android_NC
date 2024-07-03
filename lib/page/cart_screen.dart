@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_doanlt/page/cart_item.dart';
+import 'package:flutter_doanlt/page/checkout_screen.dart';
 
 class CartScreen extends StatelessWidget {
   final List<Map<String, dynamic>> cartItems = [
@@ -8,21 +9,21 @@ class CartScreen extends StatelessWidget {
       'price': 640950,
       'size': 'L',
       'quantity': 1,
-      'image': 'assets/nike_club_max.png',
+      'image': 'assets/images/nike_air_dunk.png',
     },
     {
-      'title': 'Nike Air Max Ex',
+      'title': 'Nike Air Max',
       'price': 648950,
       'size': 'XL',
       'quantity': 4,
-      'image': 'assets/nike_air_max.png',
+      'image': 'assets/images/nike_air_max.png',
     },
     {
-      'title': 'Nike Air Max Alune',
+      'title': 'Nike Air Force',
       'price': 753950,
       'size': 'XXL',
       'quantity': 2,
-      'image': 'assets/nike_air_max.png',
+      'image': 'assets/images/nike_air_force.png',
     },
   ];
 
@@ -38,7 +39,9 @@ class CartScreen extends StatelessWidget {
         title: Text('Giỏ Hàng', style: TextStyle(color: Colors.white)),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
       ),
       body: Container(
@@ -82,7 +85,9 @@ class CartScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>CheckoutScreen()));
+                    },
                     child: Text('Đặt hàng', style: TextStyle(fontSize: 16)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.yellow,

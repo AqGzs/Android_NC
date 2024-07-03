@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_doanlt/page/edit_password_screen.dart';
+import 'package:flutter_doanlt/page/edit_profile_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   @override
@@ -38,7 +40,9 @@ class ProfileScreen extends StatelessWidget {
             padding:
                 const EdgeInsets.only(right: 16.0), // Add padding to the right
             child: InkWell(
-              onTap: () {}, // Add tap callback
+              onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfileScreen()));
+              }, // Add tap callback
               splashColor: Color(0xFF6699CC),
               hoverColor: Color(0xFF6699CC), // Remove splash effect
               child: Container(
@@ -48,7 +52,8 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 padding: const EdgeInsets.all(8.0), // Add padding to the icon
                 child:
-                    Icon(Icons.edit, color: Colors.black), // Reduce icon size
+                    Icon(Icons.edit, color: Colors.black), 
+                    
               ),
             ),
           ),
@@ -95,7 +100,9 @@ class ProfileScreen extends StatelessWidget {
                   width: double.infinity,
                   height: 50.0,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>EditPasswordScreen()));
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFFFFE279), // Màu vàng
                       shape: RoundedRectangleBorder(

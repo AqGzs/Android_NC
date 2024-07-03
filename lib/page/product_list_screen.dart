@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_doanlt/detail/productDetailScreen.dart';
 import 'package:flutter_doanlt/page/filter.dart';
 import 'package:flutter_doanlt/page/product_card.dart';
 
@@ -30,6 +31,14 @@ class _ProductListScreenState extends State<ProductListScreen> {
       print('Error loading JSON: $e');
     }
   }
+
+    void _navigateToDetailScreen(Map<String, dynamic> product) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ProductDetailScreen(product: product)),
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -84,4 +93,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
     );
   }
 }
+
+
 

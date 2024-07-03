@@ -13,7 +13,9 @@ class CheckoutScreen extends StatelessWidget {
         title: Text('Thanh Toán', style: TextStyle(color: Colors.white)),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
       ),
       body: Container(

@@ -32,7 +32,9 @@ class EditProfileScreen extends StatelessWidget {
         leading: Padding(
           padding: const EdgeInsets.only(left: 16.0), // Add padding to the left
           child: InkWell(
-            onTap: () {}, // Add tap callback
+            onTap: () {
+              Navigator.pop(context);
+            }, // Add tap callback
             splashColor: Color(0xFF6699CC), // Remove splash effect
             hoverColor: Color(0xFF6699CC),
             child: Container(

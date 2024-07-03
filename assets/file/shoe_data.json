@@ -15,17 +15,17 @@
         "title": "Nike Air Cadir",
         "price": 259000,
         "label": "HÀNG MỚI",
-        "image": "assets/images/nike_air_cadir.png",
+        "image": "assets/images/nike-zoom-winflo.png",
         "gender": "Giày Nữ",
         "colors": ["blue", "red"],
         "sizes": [36, 37, 38, 39, 40]
       },
       {
         "id": 3,
-        "title": "Nike Jordan",
+        "title": "Nike Air Dunk Jombo",
         "price": 58700,
         "label": "PHIÊN BẢN GIỚI HẠN",
-        "image": "assets/images/nike_jordan.png",
+        "image": "assets/images/nike_air_dunk.png",
         "gender": "Giày Nam",
         "colors": ["blue", "green", "grey"],
         "sizes": [38, 39, 40, 41, 42, 43]
@@ -42,10 +42,10 @@
       },
       {
         "id": 5,
-        "title": "Nike Club Max",
+        "title": "Nike Blazer Mid",
         "price": 129990,
         "label": "THỊNH HÀNH",
-        "image": "assets/images/nike_club_max.png",
+        "image": "assets/images/nike_blazer_mid.png",
         "gender": "Giày Nam",
         "colors": ["blue", "green", "grey"],
         "sizes": [38, 39, 40, 41, 42, 43]
@@ -55,7 +55,7 @@
         "title": "Nike Air Focus",
         "price": 109990,
         "label": "THỊNH HÀNH",
-        "image": "assets/images/nike_air_focus.png",
+        "image": "assets/images/nike_air_force.png",
         "gender": "Giày Nam",
         "colors": ["blue", "orange"],
         "sizes": [38, 39, 40, 41, 42, 43, 44]
