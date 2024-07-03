@@ -2,10 +2,10 @@
     "shoes": [
       {
         "id": 1,
-        "title": "Nike Air Force",
+        "title": "Nike Air Jordan",
         "price": 367000,
         "label": "THỊNH HÀNH",
-        "image": "assets/nike_air_force.png",
+        "image": "assets/images/nike_air_jordan.png",
         "gender": "Giày Nam",
         "colors": ["blue", "green", "grey"],
         "sizes": [38, 39, 40, 41, 42]
@@ -15,7 +15,7 @@
         "title": "Nike Air Cadir",
         "price": 259000,
         "label": "HÀNG MỚI",
-        "image": "assets/nike_air_cadir.png",
+        "image": "assets/images/nike_air_cadir.png",
         "gender": "Giày Nữ",
         "colors": ["blue", "red"],
         "sizes": [36, 37, 38, 39, 40]
@@ -25,7 +25,7 @@
         "title": "Nike Jordan",
         "price": 58700,
         "label": "PHIÊN BẢN GIỚI HẠN",
-        "image": "assets/nike_jordan.png",
+        "image": "assets/images/nike_jordan.png",
         "gender": "Giày Nam",
         "colors": ["blue", "green", "grey"],
         "sizes": [38, 39, 40, 41, 42, 43]
@@ -35,7 +35,7 @@
         "title": "Nike Air Max",
         "price": 95730,
         "label": "XU HƯỚNG",
-        "image": "assets/nike_air_max.png",
+        "image": "assets/images/nike_air_max.png",
         "gender": "Giày Nữ",
         "colors": ["blue", "grey"],
         "sizes": [36, 37, 38, 39, 40, 41]
@@ -45,7 +45,7 @@
         "title": "Nike Club Max",
         "price": 129990,
         "label": "THỊNH HÀNH",
-        "image": "assets/nike_club_max.png",
+        "image": "assets/images/nike_club_max.png",
         "gender": "Giày Nam",
         "colors": ["blue", "green", "grey"],
         "sizes": [38, 39, 40, 41, 42, 43]
@@ -55,7 +55,7 @@
         "title": "Nike Air Focus",
         "price": 109990,
         "label": "THỊNH HÀNH",
-        "image": "assets/nike_air_focus.png",
+        "image": "assets/images/nike_air_focus.png",
         "gender": "Giày Nam",
         "colors": ["blue", "orange"],
         "sizes": [38, 39, 40, 41, 42, 43, 44]
