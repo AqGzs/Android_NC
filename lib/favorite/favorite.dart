@@ -1,33 +1,32 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_doanlt/favorite/productmodel.dart';
 
-class favorite extends StatelessWidget {
-  final List<Product> products = [
-    Product(
-      name: "Nike Jordan",
-      price: "580.790đ",
-      imageUrl: "https://i.imgur.com/ErVrYBU.png",
-      colors: [Colors.teal, Colors.blue, Colors.amber],
-    ),
-    Product(
-      name: "Nike Air Max",
-      price: "340.000đ",
-      imageUrl: "https://i.imgur.com/ErVrYBU.png",
-      colors: [Colors.teal, Colors.blue, Colors.amber],
-    ),
-    Product(
-      name: "Nike Club Max",
-      price: "250.790đ",
-      imageUrl: "https://i.imgur.com/ErVrYBU.png",
-      colors: [Colors.teal, Colors.blue, Colors.amber],
-    ),
-    Product(
-      name: "Nike Alu Max",
-      price: "730.790đ",
-      imageUrl: "https://i.imgur.com/ErVrYBU.png",
-      colors: [Colors.teal, Colors.blue, Colors.amber],
-    ),
-  ];
+class FavoriteScreen extends StatefulWidget {
+  @override
+  _FavoriteScreenState createState() => _FavoriteScreenState();
+}
+
+class _FavoriteScreenState extends State<FavoriteScreen> {
+  List<Product> products = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
+
+  Future<void> _loadProducts() async {
+    try {
+      String data = await DefaultAssetBundle.of(context).loadString('assets/file/shoe_data.json');
+      final jsonResult = json.decode(data);
+      print('Data loaded: $jsonResult');
+      setState(() {
+        products = (jsonResult['shoes'] as List).map((e) => Product.fromJson(e)).toList();
+      });
+    } catch (e) {
+      print('Error loading JSON: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,50 +56,29 @@ class favorite extends StatelessWidget {
               ),
               SizedBox(height: 20),
               Expanded(
-                child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 0.75,
-                  ),
-                  itemCount: products.length,
-                  itemBuilder: (context, index) {
-                    return ProductCard(product: products[index]);
-                  },
-                ),
+                child: products.isNotEmpty
+                    ? GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          childAspectRatio: 0.75,
+                        ),
+                        itemCount: products.length,
+                        itemBuilder: (context, index) {
+                          return ProductCard(product: products[index]);
+                        },
+                      )
+                    : Center(child: CircularProgressIndicator()),
               ),
             ],
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Favorites',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Notifications',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-        currentIndex: 1,
-        selectedItemColor: Colors.brown,
-        unselectedItemColor: Colors.grey,
-        showUnselectedLabels: true,
-      ),
     );
   }
 }
+
 class ProductCard extends StatelessWidget {
   final Product product;
 
@@ -110,7 +88,7 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,  
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -180,6 +158,29 @@ class ProductCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class Product {
+  final String name;
+  final String price;
+  final String imageUrl;
+  final List<Color> colors;
+
+  Product({
+    required this.name,
+    required this.price,
+    required this.imageUrl,
+    required this.colors,
+  });
+
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
+      name: json['title'],
+      price: '${json['price']}đ',
+      imageUrl: json['image'],
+      colors: [Colors.teal, Colors.blue, Colors.amber], // Customize as needed
     );
   }
 }

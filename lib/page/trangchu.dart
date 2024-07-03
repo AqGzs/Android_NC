@@ -2,7 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_doanlt/detail/productDetailScreen.dart';
+import 'package:flutter_doanlt/favorite/favorite.dart';
+import 'package:flutter_doanlt/notification/notification.dart';
+import 'package:flutter_doanlt/page/cart_screen.dart';
 import 'package:flutter_doanlt/page/product_list_screen.dart';
+import 'package:flutter_doanlt/page/profile_screen.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -10,6 +14,135 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String selectedCategory = '';
+  List<dynamic> products = [];
+  int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  final List<Widget> _screens = [
+    HomePageContent(),
+    FavoriteScreen(),
+    CartScreen(),
+    NotificationScreen(),
+    ProfileScreen(),
+  ];
+
+  void selectCategory(String category) {
+    setState(() {
+      selectedCategory = category;
+    });
+  }
+
+  Future<void> _loadProducts() async {
+    try {
+      String data = await DefaultAssetBundle.of(context).loadString('assets/file/shoe_data.json');
+      final jsonResult = json.decode(data);
+      print('Data loaded: $jsonResult');
+      setState(() {
+        products = jsonResult['shoes'];
+      });
+    } catch (e) {
+      print('Error loading JSON: $e');
+    }
+  }
+
+  void _navigateToDetailScreen(Map<String, dynamic> product) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ProductDetailScreen(product: product)),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _screens[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite_border),
+            label: 'Favorites',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_bag_outlined),
+            label: 'Cart',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.notifications_active_outlined),
+            label: 'Notifications',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_2_outlined),
+            label: 'Profile',
+          ),
+        ],
+        currentIndex: _currentIndex,
+        selectedItemColor: Colors.brown,
+        unselectedItemColor: Colors.grey,
+        showUnselectedLabels: true,
+        onTap: _onItemTapped,
+      ),
+    );
+  }
+}
+
+class HomePageContent extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xFF6699CC),
+      appBar: AppBar(
+        backgroundColor: Color(0xFF6699CC),
+        elevation: 0,
+        leading: Icon(Icons.menu),
+        title: Center(
+          child: Text(
+            'F5Store',
+            style: TextStyle(
+              fontSize: 20.0,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(right: 16.0),
+            child: IconButton(
+              icon: Icon(Icons.shopping_cart),
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=> CartScreen()));
+              },
+            ),
+          ),
+        ],
+      ),
+      body: HomePageBody(),
+    );
+  }
+}
+
+class HomePageBody extends StatefulWidget {
+  @override
+  _HomePageBodyState createState() => _HomePageBodyState();
+}
+
+class _HomePageBodyState extends State<HomePageBody> {
   String selectedCategory = '';
   List<dynamic> products = [];
 
@@ -47,176 +180,121 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xFF6699CC),
-      appBar: AppBar(
-        backgroundColor: Color(0xFF6699CC),
-        elevation: 0,
-        leading: Icon(Icons.menu),
-        title: Center(
-          child: Text(
-            'F5Store',
-            style: TextStyle(
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: IconButton(
-              icon: Icon(Icons.shopping_cart),
-              onPressed: () {},
-            ),
-          ),
-        ],
-      ),
-      body: products.isNotEmpty
-          ? CustomScrollView(
-              slivers: [
-                SliverAppBar(
-                  pinned: true,
-                  backgroundColor: Color(0xFF6699CC),
-                  title: TextField(
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.search),
-                      hintText: 'Tìm kiếm',
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(35.0),
-                        borderSide: BorderSide.none,
+    return products.isNotEmpty
+        ? CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                pinned: true,
+                backgroundColor: Color(0xFF6699CC),
+                title: TextField(
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.search),
+                    hintText: 'Tìm kiếm',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(35.0),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 24.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          CategoryButton(
+                            iconPath: 'assets/images/logo_nike.png',
+                            isSelected: selectedCategory == 'Nike',
+                            onTap: () => selectCategory('Nike'),
+                          ),
+                          CategoryButton(
+                            iconPath: 'assets/images/logo_puma.png',
+                            isSelected: selectedCategory == 'Puma',
+                            onTap: () => selectCategory('Puma'),
+                          ),
+                          CategoryButton(
+                            iconPath: 'assets/images/logo_underarmour.png',
+                            isSelected: selectedCategory == 'Under Armour',
+                            onTap: () => selectCategory('Under Armour'),
+                          ),
+                          CategoryButton(
+                            iconPath: 'assets/images/logo_adidas.png',
+                            isSelected: selectedCategory == 'Adidas',
+                            onTap: () => selectCategory('Adidas'),
+                          ),
+                          CategoryButton(
+                            iconPath: 'assets/images/logo_converse.png',
+                            isSelected: selectedCategory == 'Converse',
+                            onTap: () => selectCategory('Converse'),
+                          ),
+                        ],
                       ),
-                    ),
+                      SizedBox(height: 16.0),
+                      SectionTitle(
+                        title: 'Nổi Bật',
+                        onViewAll: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => ProductListScreen()),
+                          );
+                        },
+                      ),
+                      SizedBox(height: 10.0),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: products.map((product) {
+                            return GestureDetector(
+                              onTap: () => _navigateToDetailScreen(product),
+                              child: ProductCard(
+                                imagePath: product['image'],
+                                name: product['title'],
+                                price: '${product['price']}đ',
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                      SizedBox(height: 16.0),
+                      SectionTitle(
+                        title: 'Sản Phẩm Mới',
+                        onViewAll: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => ProductListScreen()),
+                          );
+                        },
+                      ),
+                      SizedBox(height: 10.0),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: products.map((product) {
+                            return GestureDetector(
+                              onTap: () => _navigateToDetailScreen(product),
+                              child: ProductCard1(
+                                imagePath: product['image'],
+                                name: product['title'],
+                                price: '${product['price']}đ',
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: 24.0),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            CategoryButton(
-                              iconPath: 'assets/logo_nike.png',
-                              isSelected: selectedCategory == 'Nike',
-                              onTap: () => selectCategory('Nike'),
-                            ),
-                            CategoryButton(
-                              iconPath: 'assets/logo_puma.png',
-                              isSelected: selectedCategory == 'Puma',
-                              onTap: () => selectCategory('Puma'),
-                            ),
-                            CategoryButton(
-                              iconPath: 'assets/logo_underarmour.png',
-                              isSelected: selectedCategory == 'Under Armour',
-                              onTap: () => selectCategory('Under Armour'),
-                            ),
-                            CategoryButton(
-                              iconPath: 'assets/logo_adidas.png',
-                              isSelected: selectedCategory == 'Adidas',
-                              onTap: () => selectCategory('Adidas'),
-                            ),
-                            CategoryButton(
-                              iconPath: 'assets/logo_converse.png',
-                              isSelected: selectedCategory == 'Converse',
-                              onTap: () => selectCategory('Converse'),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 16.0),
-                        SectionTitle(
-                          title: 'Nổi Bật',
-                          onViewAll: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => ProductListScreen()),
-                            );
-                          },
-                        ),
-                        SizedBox(height: 10.0),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: products.map((product) {
-                              return GestureDetector(
-                                onTap: () => _navigateToDetailScreen(product),
-                                child: ProductCard(
-                                  imagePath: product['image'],
-                                  name: product['title'],
-                                  price: '${product['price']}đ',
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                        SizedBox(height: 16.0),
-                        SectionTitle(
-                          title: 'Sản Phẩm Mới',
-                          onViewAll: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => ProductListScreen()),
-                            );
-                          },
-                        ),
-                        SizedBox(height: 10.0),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: products.map((product) {
-                              return GestureDetector(
-                                onTap: () => _navigateToDetailScreen(product),
-                                child: ProductCard1(
-                                  imagePath: product['image'],
-                                  name: product['title'],
-                                  price: '${product['price']}đ',
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            )
-          : Center(child: CircularProgressIndicator()),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_border),
-            label: 'Favorites',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_bag_outlined),
-            label: 'Cart',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications_active_outlined),
-            label: 'Notifications',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_2_outlined),
-            label: 'Profile',
-          ),
-        ],
-        currentIndex: 0,
-        selectedItemColor: Colors.brown,
-        unselectedItemColor: Colors.grey,
-        showUnselectedLabels: true,
-      ),
-    );
+              ),
+            ],
+          )
+        : Center(child: CircularProgressIndicator());
   }
 }
 

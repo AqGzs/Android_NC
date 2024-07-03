@@ -1,37 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_doanlt/notification/notificationItem.dart';
- 
-class NotificationScreen extends StatelessWidget {
-  final List<NotificationItem> todayNotifications = [
-    NotificationItem(
-      imageUrl: 'https://i.imgur.com/ErVrYBU.png',
-      description: 'Chúng tôi có sản phẩm mới với các ưu đãi',
-      price: '365.950đ',
-      time: '6 phút trước',
-    ),
-    NotificationItem(
-      imageUrl: 'https://i.imgur.com/ErVrYBU.png',
-      description: 'Chúng tôi có sản phẩm mới với các ưu đãi',
-      price: '450.950đ',
-      time: '26 phút trước',
-    ),
-  ];
 
-  final List<NotificationItem> yesterdayNotifications = [
-    NotificationItem(
-      imageUrl: 'https://i.imgur.com/ErVrYBU.png',
-      description: 'Chúng tôi có sản phẩm mới với các ưu đãi',
-      price: '365.95đ',
-      time: '4 ngày trước',
-    ),
-    NotificationItem(
-      imageUrl: 'https://i.imgur.com/ErVrYBU.png',
-      description: 'Chúng tôi có sản phẩm mới với các ưu đãi',
-      price: '365.95đ',
-      time: '4 ngày trước',
-    ),
-  ];
+class NotificationScreen extends StatelessWidget {
+  final Map<String, List<NotificationItem>> notifications = {
+    'Hôm nay': [
+      NotificationItem(
+        imageUrl: 'assets/images/nike_blazer_mid.png',
+        description: 'Chúng tôi có sản phẩm mới với các ưu đãi',
+        price: '365.950đ',
+        time: '6 phút trước',
+      ),
+      NotificationItem(
+        imageUrl: 'assets/images/nike_blazer_mid.png',
+        description: 'Chúng tôi có sản phẩm mới với các ưu đãi',
+        price: '450.950đ',
+        time: '26 phút trước',
+      ),
+    ],
+    'Hôm qua': [
+      NotificationItem(
+        imageUrl: 'assets/images/nike_blazer_mid.png',
+        description: 'Chúng tôi có sản phẩm mới với các ưu đãi',
+        price: '365.95đ',
+        time: '4 ngày trước',
+      ),
+      NotificationItem(
+        imageUrl: 'assets/images/nike_blazer_mid.png',
+        description: 'Chúng tôi có sản phẩm mới với các ưu đãi',
+        price: '365.95đ',
+        time: '4 ngày trước',
+      ),
+    ],
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +41,7 @@ class NotificationScreen extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              color:Color(0xFF6699CC),
+              color: Color(0xFF6699CC),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
@@ -74,21 +74,20 @@ class NotificationScreen extends StatelessWidget {
                   child: SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Hôm nay',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 10),
-                        ...todayNotifications.map((notification) => NotificationCard(notification: notification)).toList(),
-                        SizedBox(height: 20),
-                        Text(
-                          'Hôm qua',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 10),
-                        ...yesterdayNotifications.map((notification) => NotificationCard(notification: notification)).toList(),
-                      ],
+                      children: notifications.entries.map((entry) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              entry.key,
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 10),
+                            ...entry.value.map((notification) => NotificationCard(notification: notification)).toList(),
+                            SizedBox(height: 20),
+                          ],
+                        );
+                      }).toList(),
                     ),
                   ),
                 ),
@@ -97,33 +96,10 @@ class NotificationScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Favorites',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Notifications',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-        currentIndex: 2,
-        selectedItemColor: Colors.brown,
-        unselectedItemColor: Colors.grey,
-        showUnselectedLabels: true,
-      ),
     );
   }
 }
+
 class NotificationCard extends StatelessWidget {
   final NotificationItem notification;
 
@@ -136,11 +112,12 @@ class NotificationCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.network(
+          Image.asset(
             notification.imageUrl,
             height: 60,
             width: 60,
             fit: BoxFit.cover,
+        
           ),
           SizedBox(width: 10),
           Expanded(
