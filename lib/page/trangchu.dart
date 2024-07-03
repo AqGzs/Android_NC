@@ -1,18 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'dart:convert';
 
-class F5StoreApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'F5Store',
-      home: HomePage(),
-      theme: ThemeData(
-        primaryColor: Color(0xFF6699CC),
-      ),
-    );
-  }
-}
+import 'package:flutter/material.dart';
+import 'package:flutter_doanlt/detail/productDetailScreen.dart';
+import 'package:flutter_doanlt/page/product_list_screen.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -21,11 +11,38 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String selectedCategory = '';
+  List<dynamic> products = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
 
   void selectCategory(String category) {
     setState(() {
       selectedCategory = category;
     });
+  }
+
+  Future<void> _loadProducts() async {
+    try {
+      String data = await DefaultAssetBundle.of(context).loadString('assets/file/shoe_data.json');
+      final jsonResult = json.decode(data);
+      print('Data loaded: $jsonResult');
+      setState(() {
+        products = jsonResult['shoes'];
+      });
+    } catch (e) {
+      print('Error loading JSON: $e');
+    }
+  }
+
+  void _navigateToDetailScreen(Map<String, dynamic> product) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ProductDetailScreen(product: product)),
+    );
   }
 
   @override
@@ -37,19 +54,17 @@ class _HomePageState extends State<HomePage> {
         elevation: 0,
         leading: Icon(Icons.menu),
         title: Center(
-          // Wrap with Center widget
           child: Text(
             'F5Store',
             style: TextStyle(
               fontSize: 20.0,
-              fontWeight: FontWeight.bold, // Make the text bold
-              color: Colors.black, // Keep the text white
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
             ),
           ),
         ),
         actions: [
           Padding(
-            // Align shopping cart button to the right edge of the search bar
             padding: EdgeInsets.only(right: 16.0),
             child: IconButton(
               icon: Icon(Icons.shopping_cart),
@@ -58,121 +73,121 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            pinned: true,
-            backgroundColor:
-                Color(0xFF6699CC), // make the app bar fixed at the top
-            title: TextField(
-              decoration: InputDecoration(
-                prefixIcon: Icon(Icons.search),
-                hintText: 'Tìm kiếm',
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(35.0),
-                  borderSide: BorderSide.none,
+      body: products.isNotEmpty
+          ? CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  pinned: true,
+                  backgroundColor: Color(0xFF6699CC),
+                  title: TextField(
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.search),
+                      hintText: 'Tìm kiếm',
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(35.0),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 24.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      CategoryButton(
-                        iconPath: 'assets/logo_nike.png',
-                        //label: 'Nike',
-                        isSelected: selectedCategory == 'Nike',
-                        onTap: () => selectCategory('Nike'),
-                      ),
-                      CategoryButton(
-                        iconPath: 'assets/logo_puma.png',
-                        //label: 'Puma',
-                        isSelected: selectedCategory == 'Puma',
-                        onTap: () => selectCategory('Puma'),
-                      ),
-                      CategoryButton(
-                        iconPath: 'assets/logo_underarmour.png',
-                        //label: 'Under Armour',
-                        isSelected: selectedCategory == 'Under Armour',
-                        onTap: () => selectCategory('Under Armour'),
-                      ),
-                      CategoryButton(
-                        iconPath: 'assets/logo_adidas.png',
-                        //label: 'Adidas',
-                        isSelected: selectedCategory == 'Adidas',
-                        onTap: () => selectCategory('Adidas'),
-                      ),
-                      CategoryButton(
-                        iconPath: 'assets/logo_converse.png',
-                        //label: 'Converse',
-                        isSelected: selectedCategory == 'Converse',
-                        onTap: () => selectCategory('Converse'),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16.0),
-                  SectionTitle(title: 'Nổi Bật', onViewAll: () {}),
-                  SizedBox(height: 10.0),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ProductCard(
-                          imagePath: 'assets/nike-zoom-winflo.png',
-                          name: 'Nike Jordan',
-                          price: '493.000đ',
+                        SizedBox(height: 24.0),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            CategoryButton(
+                              iconPath: 'assets/logo_nike.png',
+                              isSelected: selectedCategory == 'Nike',
+                              onTap: () => selectCategory('Nike'),
+                            ),
+                            CategoryButton(
+                              iconPath: 'assets/logo_puma.png',
+                              isSelected: selectedCategory == 'Puma',
+                              onTap: () => selectCategory('Puma'),
+                            ),
+                            CategoryButton(
+                              iconPath: 'assets/logo_underarmour.png',
+                              isSelected: selectedCategory == 'Under Armour',
+                              onTap: () => selectCategory('Under Armour'),
+                            ),
+                            CategoryButton(
+                              iconPath: 'assets/logo_adidas.png',
+                              isSelected: selectedCategory == 'Adidas',
+                              onTap: () => selectCategory('Adidas'),
+                            ),
+                            CategoryButton(
+                              iconPath: 'assets/logo_converse.png',
+                              isSelected: selectedCategory == 'Converse',
+                              onTap: () => selectCategory('Converse'),
+                            ),
+                          ],
                         ),
-                        SizedBox(width: 16.0),
-                        ProductCard(
-                          imagePath: 'assets/nike_airmax.png',
-                          name: 'Nike Air Max',
-                          price: '899.000đ',
+                        SizedBox(height: 16.0),
+                        SectionTitle(
+                          title: 'Nổi Bật',
+                          onViewAll: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => ProductListScreen()),
+                            );
+                          },
                         ),
-                        SizedBox(width: 16.0),
-                        ProductCard(
-                          imagePath: 'assets/nike_airmax.png',
-                          name: 'Nike Air Max',
-                          price: '899.000đ',
+                        SizedBox(height: 10.0),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: products.map((product) {
+                              return GestureDetector(
+                                onTap: () => _navigateToDetailScreen(product),
+                                child: ProductCard(
+                                  imagePath: product['image'],
+                                  name: product['title'],
+                                  price: '${product['price']}đ',
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                        SizedBox(height: 16.0),
+                        SectionTitle(
+                          title: 'Sản Phẩm Mới',
+                          onViewAll: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => ProductListScreen()),
+                            );
+                          },
+                        ),
+                        SizedBox(height: 10.0),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: products.map((product) {
+                              return GestureDetector(
+                                onTap: () => _navigateToDetailScreen(product),
+                                child: ProductCard1(
+                                  imagePath: product['image'],
+                                  name: product['title'],
+                                  price: '${product['price']}đ',
+                                ),
+                              );
+                            }).toList(),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(height: 16.0),
-                  SectionTitle(title: 'Sản Phẩm Mới', onViewAll: () {}),
-                  SizedBox(height: 10.0),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        ProductCard1(
-                          imagePath: 'assets/nike_air_jordan.png',
-                          name: 'Nike Air Jordan',
-                          price: '849.000đ',
-                        ),
-                        SizedBox(width: 16.0),
-                        ProductCard1(
-                          imagePath: 'assets/nike_air_jordan.png',
-                          name: 'Nike Air Jordan',
-                          price: '849.000đ',
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+                ),
+              ],
+            )
+          : Center(child: CircularProgressIndicator()),
       bottomNavigationBar: BottomNavigationBar(
         items: [
           BottomNavigationBarItem(
@@ -185,7 +200,7 @@ class _HomePageState extends State<HomePage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_bag_outlined),
-            label: 'Favorites',
+            label: 'Cart',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.notifications_active_outlined),
@@ -207,13 +222,11 @@ class _HomePageState extends State<HomePage> {
 
 class CategoryButton extends StatelessWidget {
   final String iconPath;
-  //final String label;
   final bool isSelected;
   final VoidCallback onTap;
 
   CategoryButton({
     required this.iconPath,
-    //required this.label,
     required this.isSelected,
     required this.onTap,
   });
@@ -235,7 +248,6 @@ class CategoryButton extends StatelessWidget {
         child: Column(
           children: [
             Image.asset(iconPath, width: 40.0, height: 40.0),
-            //Text(label, style: TextStyle(fontSize: 12.0)),
           ],
         ),
       ),
@@ -267,31 +279,6 @@ class SectionTitle extends StatelessWidget {
           child: Text('Xem thêm', style: TextStyle(color: Colors.black54)),
         ),
       ],
-    );
-  }
-}
-
-class FavoriteButton extends StatefulWidget {
-  @override
-  _FavoriteButtonState createState() => _FavoriteButtonState();
-}
-
-class _FavoriteButtonState extends State<FavoriteButton> {
-  bool _isFavorite = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        setState(() {
-          _isFavorite = !_isFavorite;
-        });
-      },
-      child: Icon(
-        _isFavorite ? Icons.favorite : Icons.favorite_border,
-        size: 30.0,
-        color: _isFavorite ? Colors.red : Colors.black,
-      ),
     );
   }
 }
@@ -382,14 +369,14 @@ class ProductCard extends StatelessWidget {
                   },
                   splashColor: Colors.white,
                   child: Container(
-                    width: 50.0, // adjust the width
+                    width: 50.0,
                     height: 50.0,
                     decoration: BoxDecoration(
                       color: Colors.black,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(20.0),
                         bottomRight: Radius.circular(20.0),
-                      ), // adjust the radius to your liking
+                      ),
                     ),
                     child: Icon(
                       Icons.add,
@@ -434,7 +421,7 @@ class ProductCard1 extends StatelessWidget {
                 child: Expanded(
                   flex: 1,
                   child: Padding(
-                    padding: EdgeInsets.only(left: 10.0), // add left padding
+                    padding: EdgeInsets.only(left: 10.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -476,7 +463,7 @@ class ProductCard1 extends StatelessWidget {
               Expanded(
                 flex: 2,
                 child: Padding(
-                  padding: EdgeInsets.only(right: 10.0), // add right padding
+                  padding: EdgeInsets.only(right: 10.0),
                   child: Stack(
                     children: [
                       ClipRRect(
@@ -500,6 +487,31 @@ class ProductCard1 extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class FavoriteButton extends StatefulWidget {
+  @override
+  _FavoriteButtonState createState() => _FavoriteButtonState();
+}
+
+class _FavoriteButtonState extends State<FavoriteButton> {
+  bool _isFavorite = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _isFavorite = !_isFavorite;
+        });
+      },
+      child: Icon(
+        _isFavorite ? Icons.favorite : Icons.favorite_border,
+        size: 30.0,
+        color: _isFavorite ? Colors.red : Colors.black,
       ),
     );
   }

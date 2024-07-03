@@ -22,12 +22,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
     try {
       String data = await DefaultAssetBundle.of(context).loadString('assets/file/shoe_data.json');
       final jsonResult = json.decode(data);
-      print('Data loaded: $jsonResult');  // Thêm dòng này để kiểm tra dữ liệu JSON
+      print('Data loaded: $jsonResult');
       setState(() {
         products = jsonResult['shoes'];
       });
     } catch (e) {
-      print('Error loading JSON: $e');  // Thêm dòng này để kiểm tra lỗi
+      print('Error loading JSON: $e');
     }
   }
 
@@ -39,7 +39,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
         title: Text('Giày Nike', style: TextStyle(color: Colors.white)),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
         actions: [
           IconButton(
@@ -77,7 +79,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   return ProductCard(product: products[index]);
                 },
               )
-            : Center(child: CircularProgressIndicator()),  // Hiển thị khi dữ liệu chưa được tải
+            : Center(child: CircularProgressIndicator()),
       ),
     );
   }
