@@ -20,7 +20,9 @@ class _SignInScreenState extends State<SignInScreen> {
         leading: Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
           child: InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.pop(context);
+            },
             splashColor: Color(0xFF6699CC),
             hoverColor: Color(0xFF6699CC),
             child: Container(
