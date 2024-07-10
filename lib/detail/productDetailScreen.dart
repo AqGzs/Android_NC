@@ -26,42 +26,71 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       backgroundColor: Color(0xFF6699CC),
       appBar: AppBar(
         backgroundColor: Color(0xFF6699CC),
-        elevation: 0,
-        title: Text('Giày Nam', style: TextStyle(color: Colors.white)),
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+        leading: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
+          child: InkWell(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            splashColor: Color(0xFF6699CC),
+            hoverColor: Color(0xFF6699CC),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
+              child: Icon(Icons.arrow_back_ios, size: 20),
+            ),
+          ),
+        ),
+        title: Padding(
+          padding: const EdgeInsets.only(top: 22),
+          child: Center(
+            child: Text(
+              'Giày Nam',
+              style: TextStyle(
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
         ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.shopping_bag, color: Colors.white),
-            onPressed: () {},
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 16, 16, 0),
+            child: InkWell(
+              onTap: () {},
+              splashColor: Color(0xFF6699CC),
+              hoverColor: Color(0xFF6699CC),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(Icons.shopping_bag, size: 20),
+              ),
+            ),
           ),
         ],
       ),
       body: Column(
         children: [
-          // Image Section
           Container(
             color: Color(0xFF6699CC),
             padding: const EdgeInsets.all(16.0),
             child: Center(
-              child: Image.asset(
-                widget.product['image'],
-                height: 180,
-                fit: BoxFit.cover
-              ),
+              child: Image.asset(widget.product['image'],
+                  height: 180, fit: BoxFit.cover),
             ),
           ),
-          // Main Content Section
           Expanded(
             child: Container(
               decoration: BoxDecoration(
                 color: Color(0xFFD3E2E9),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
               ),
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16.0),
@@ -72,7 +101,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       widget.product['label'],
                       style: TextStyle(
                         color: Color(0xFF5B9EE1),
-                        fontSize: 14.0,
+                        fontSize: 16.0,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -80,7 +109,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     Text(
                       widget.product['title'],
                       style: TextStyle(
-                        fontSize: 24.0,
+                        fontSize: 22.0,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
@@ -89,7 +118,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     Text(
                       'Còn hàng',
                       style: TextStyle(
-                        fontSize: 16.0,
+                        fontSize: 18.0,
                         color: Colors.black,
                       ),
                     ),
@@ -97,7 +126,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     Text(
                       'Nike Air Jordan là dòng giày bóng rổ của Nike, nổi bật với phong cách và thiết kế độc đáo, nó còn có sự ảnh hưởng lớn trong thể thao và thời trang...',
                       style: TextStyle(
-                        fontSize: 16.0,
+                        fontSize: 18.0,
                         color: Colors.black,
                       ),
                     ),
@@ -153,46 +182,50 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       }).toList(),
                     ),
                     SizedBox(height: 16),
-                   Row(
-                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                       Text(
-                      'GIÁ SẢN PHẨM',
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      '${widget.product['price']}đ',
-                      style: TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.normal,
-                        color: Colors.blue,
-                      ),
-                    ),]
-                   ),
-                    SizedBox(height: 16),
-                    Center(
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'GIÁ SẢN PHẨM',
+                              style: TextStyle(
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Text(
+                              '${widget.product['price']}đ',
+                              style: TextStyle(
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.blue,
+                              ),
+                            ),
+                          ],
+                        ),
+                        ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 15),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
+                          child: Text(
+                            'Thêm vào giỏ',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                        child: Text(
-                          'Thêm vào giỏ',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
@@ -240,7 +273,7 @@ class ColorOption extends StatelessWidget {
       margin: EdgeInsets.only(right: 8),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: isSelected ? Border.all(color: Colors.blue, width: 3) : null,
+        border: isSelected ? Border.all(color: Colors.white, width: 3) : null,
       ),
       child: CircleAvatar(
         radius: 15,

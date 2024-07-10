@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_doanlt/page/resetpassword_screen.dart';
+import 'package:flutter_doanlt/page/trangchu.dart';
 
 import 'signup.dart';
 
@@ -13,96 +15,140 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF6699CC), // Blue background color
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: IconButton(
-                  icon: Icon(Icons.arrow_back),
-                  onPressed: () {
-                    // Handle back button press
+      appBar: AppBar(
+        backgroundColor: Color(0xFF6699CC),
+        leading: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
+          child: InkWell(
+            onTap: () {},
+            splashColor: Color(0xFF6699CC),
+            hoverColor: Color(0xFF6699CC),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
+              child: Icon(Icons.arrow_back_ios, size: 20),
+            ),
+          ),
+        ),
+      ),
+      backgroundColor: Color(0xFF6699CC),
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
+        child: Column(
+          children: [
+            SizedBox(height: 20),
+            Text(
+              'Xin chào ! 👋',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            Text(
+              'Chào mừng bạn quay trở lại !',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.black,
+              ),
+            ),
+            SizedBox(height: 40),
+            _buildTextField('Địa chỉ email', 'Nhập địa chỉ email'),
+            SizedBox(height: 20),
+            _buildPasswordField(),
+            SizedBox(height: 4),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ResetPasswordScreen()));
                   },
-                  color: Colors.black,
-                ),
-              ),
-              SizedBox(height: 20),
-              Text(
-                'Xin chào ! 👋',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              SizedBox(height: 8),
-              Text(
-                'Chào mừng bạn quay trở lại !',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black,
-                ),
-              ),
-              SizedBox(height: 24),
-              _buildTextField('Địa chỉ email', 'Nhập địa chỉ email'),
-              SizedBox(height: 16),
-              _buildPasswordField(),
-              SizedBox(height: 16),
-              Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  'Quên mật khẩu ?',
-                  style: TextStyle(color: Colors.black),
-                ),
-              ),
-              SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  // Handle sign in
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFFFD966), // Yellow color
-                  minimumSize: Size(double.infinity, 50),
-                ),
-                child: Text('Đăng nhập'),
-              ),
-              SizedBox(height: 16),
-              ElevatedButton.icon(
-                onPressed: () {
-                  // Handle sign in with Google
-                },
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black, backgroundColor: Colors.white,
-                  minimumSize: Size(double.infinity, 50),
-                ),
-                icon: Image.asset('images/google_logo.png', height: 24),
-                label: Text('Đăng nhập với Google'),
-              ),
-              SizedBox(height: 16),
-              Text(
-                'Chưa có tài khoản ?',
-                style: TextStyle(color: Colors.black),
-              ),
-              GestureDetector(
-                onTap: () {
-                  // Chuyển hướng sang trang đăng ký
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => SignUpScreen()));
-                },
-                child: Text(
-                  'Đăng ký ngay',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
+                  child: Text(
+                    'Quên mật khẩu?',
+                    style: TextStyle(color: Colors.black),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+            SizedBox(height: 40),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => HomePage()));
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFFFE279),
+                minimumSize: Size(double.infinity, 55),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              child: Text(
+                'Đăng nhập',
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.black,
+                backgroundColor: Colors.white,
+                minimumSize: Size(double.infinity, 55),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              icon: Image.asset('images/logo_google.png', height: 24),
+              label: Text(
+                'Đăng nhập với Google',
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            Spacer(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Chưa có tài khoản?',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SignUpScreen()));
+                  },
+                  child: Text(
+                    ' Đăng ký ngay',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -117,6 +163,7 @@ class _SignInScreenState extends State<SignInScreen> {
           style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
+            fontSize: 18,
           ),
         ),
         SizedBox(height: 8),
@@ -127,9 +174,15 @@ class _SignInScreenState extends State<SignInScreen> {
             fillColor: Colors.white,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30.0),
+              borderSide: BorderSide(color: Colors.white),
             ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(30.0),
+              borderSide: BorderSide(color: Colors.white),
+            ),
+            contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           ),
-        ),
+        )
       ],
     );
   }
@@ -143,6 +196,7 @@ class _SignInScreenState extends State<SignInScreen> {
           style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
+            fontSize: 18,
           ),
         ),
         SizedBox(height: 8),
@@ -154,21 +208,29 @@ class _SignInScreenState extends State<SignInScreen> {
             fillColor: Colors.white,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30.0),
+              borderSide: BorderSide(color: Colors.white),
             ),
-            suffixIcon: IconButton(
-              icon: Icon(
-                _obscurePassword ? Icons.visibility_off : Icons.visibility,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(30.0),
+              borderSide: BorderSide(color: Colors.white),
+            ),
+            suffixIcon: Padding(
+              padding: EdgeInsets.only(right: 8),
+              child: IconButton(
+                icon: Icon(
+                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscurePassword = !_obscurePassword;
+                  });
+                },
               ),
-              onPressed: () {
-                setState(() {
-                  _obscurePassword = !_obscurePassword;
-                });
-              },
             ),
+            contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           ),
         ),
       ],
     );
   }
 }
-

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_doanlt/page/signup.dart';
+
+import 'login.dart';
 
 class StartPage extends StatelessWidget {
   @override
@@ -8,53 +11,81 @@ class StartPage extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Spacer(),
-              Image.asset('assets/images/logo_main.png', height: 200), 
-              SizedBox(height: 40),
-              Text(
-                'Explore the app',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+              SizedBox(height: 60),
+              Stack(
+                children: [
+                  Container(
+                    height: 350,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage('assets/images/giay_start.png'),
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Image.asset('assets/images/logo_f5store.png',
+                        height: 120),
+                  ),
+                ],
               ),
-              SizedBox(height: 10),
               Text(
-                'Now your finances are in one place\nand always under control',
+                'Cùng nhau khám phá những bộ sưu tập thời thượng và ưu đãi hấp dẫn !!!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[600],
+                  fontSize: 20,
+                  color: Colors.black,
                 ),
               ),
-              Spacer(),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Handle Sign In
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
+              Spacer(flex: 2),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => SignInScreen()));
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFFFFE279),
+                  minimumSize: Size(double.infinity, 55),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Text('Sign In'),
                 ),
-              ),
-              SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: OutlinedButton(
-                  onPressed: () {
-                    // Handle Create Account
-                  },
-                  child: Text('Create account'),
+                child: Text(
+                  'Đăng nhập',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
               SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => SignUpScreen()));
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFFFFE279),
+                  minimumSize: Size(double.infinity, 55),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: Text(
+                  'Đăng ký',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+              SizedBox(height: 30),
             ],
           ),
         ),

@@ -8,11 +8,11 @@ class CartItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: 10),
+      margin: EdgeInsets.only(bottom: 12),
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         children: [
@@ -20,8 +20,8 @@ class CartItem extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
             child: Image.asset(
               item['image'],
-              width: 60,
-              height: 60,
+              width: 75,
+              height: 75,
               fit: BoxFit.cover,
             ),
           ),
@@ -32,16 +32,16 @@ class CartItem extends StatelessWidget {
               children: [
                 Text(
                   item['title'],
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   '${item['price'].toStringAsFixed(0)}đ',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  style: TextStyle(fontSize: 18, color: Colors.grey),
                 ),
                 Text(
                   'Size: ${item['size']}',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  style: TextStyle(fontSize: 18, color: Colors.grey),
                 ),
               ],
             ),
@@ -54,7 +54,7 @@ class CartItem extends StatelessWidget {
               ),
               Text(
                 item['quantity'].toString(),
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(fontSize: 18),
               ),
               IconButton(
                 icon: Icon(Icons.add_circle_outline),

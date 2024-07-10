@@ -10,37 +10,37 @@ class ProductCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10.0),
+        borderRadius: BorderRadius.circular(20.0),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Stack(
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(10.0),
-                  topRight: Radius.circular(10.0),
-                ),
-                child: Image.asset(
-                  product['image'],
-                  height: 100,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
+              Padding(
+                padding: EdgeInsets.only(top: 10),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(10.0),
+                    topRight: Radius.circular(10.0),
+                  ),
+                  child: Image.asset(
+                    product['image'],
+                    height: 120,
+                    width: double.infinity,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
               Positioned(
-                right: 8.0,
-                top: 8.0,
-                child: Icon(
-                  Icons.favorite_border,
-                  color: Colors.black,
-                ),
+                left: 12.0,
+                top: 12.0,
+                child: FavoriteButton(),
               ),
             ],
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(12.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -48,23 +48,23 @@ class ProductCard extends StatelessWidget {
                   product['label'],
                   style: TextStyle(
                     color: Colors.blue,
-                    fontSize: 12,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 4.0),
+                SizedBox(height: 6.0),
                 Text(
                   product['title'],
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 4.0),
+                SizedBox(height: 6.0),
                 Text(
                   product['gender'],
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 14,
                     color: Colors.grey,
                   ),
                 ),
@@ -116,4 +116,28 @@ class ProductCard extends StatelessWidget {
   }
 }
 
+class FavoriteButton extends StatefulWidget {
+  @override
+  _FavoriteButtonState createState() => _FavoriteButtonState();
+}
+
+class _FavoriteButtonState extends State<FavoriteButton> {
+  bool _isFavorite = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _isFavorite = !_isFavorite;
+        });
+      },
+      child: Icon(
+        _isFavorite ? Icons.favorite : Icons.favorite_border,
+        size: 30.0,
+        color: _isFavorite ? Colors.red : Colors.black,
+      ),
+    );
+  }
+}
 

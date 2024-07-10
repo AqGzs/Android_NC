@@ -6,54 +6,59 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF6699CC), // Màu nền xanh nhạt
+      backgroundColor: Color(0xFF6699CC),
       appBar: AppBar(
         backgroundColor: Color(0xFF6699CC),
         leading: Padding(
-          padding: const EdgeInsets.only(left: 16.0), // Add padding to the left
+          padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
           child: InkWell(
-            onTap: () {}, // Add tap callback
-            splashColor: Color(0xFF6699CC), // Remove splash effect
+            onTap: () {
+              Navigator.pop(context);
+            },
+            splashColor: Color(0xFF6699CC),
             hoverColor: Color(0xFF6699CC),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white, // White background
-                shape: BoxShape.circle, // Circular shape
+                color: Colors.white,
+                shape: BoxShape.circle,
               ),
-              padding: const EdgeInsets.all(8.0), // Add padding to the icon
-              child: Icon(Icons.arrow_back_ios, size: 20), // Reduce icon size
+              padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
+              child: Icon(Icons.arrow_back_ios, size: 20),
             ),
           ),
         ),
-        title: Center(
-          child: Text(
-            'Thông tin tài khoản',
-            style: TextStyle(
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+        title: Padding(
+          padding: const EdgeInsets.only(top: 24),
+          child: Center(
+            child: Text(
+              'Thông tin tài khoản',
+              style: TextStyle(
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
           ),
         ),
         actions: [
           Padding(
-            padding:
-                const EdgeInsets.only(right: 16.0), // Add padding to the right
+            padding: const EdgeInsets.fromLTRB(0, 16, 16, 0),
             child: InkWell(
               onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfileScreen()));
-              }, // Add tap callback
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => EditProfileScreen()));
+              },
               splashColor: Color(0xFF6699CC),
-              hoverColor: Color(0xFF6699CC), // Remove splash effect
+              hoverColor: Color(0xFF6699CC),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white, // White background
-                  shape: BoxShape.circle, // Circular shape
+                  color: Colors.white,
+                  shape: BoxShape.circle,
                 ),
-                padding: const EdgeInsets.all(8.0), // Add padding to the icon
-                child:
-                    Icon(Icons.edit, color: Colors.black), 
-                    
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(Icons.border_color_rounded, size: 20),
               ),
             ),
           ),
@@ -61,10 +66,10 @@ class ProfileScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          SizedBox(height: 20),
+          SizedBox(height: 30),
           CircleAvatar(
             radius: 50,
-            backgroundImage: AssetImage('assets/avatar.png'),
+            backgroundImage: AssetImage('assets/images/avatar.png'),
           ),
           SizedBox(height: 30),
           Container(
@@ -89,10 +94,9 @@ class ProfileScreen extends StatelessWidget {
               ],
             ),
           ),
-          //SizedBox(height: 20),
-          Spacer(), // Add a Spacer to push the buttons to the bottom
+          Spacer(),
           Padding(
-            padding: EdgeInsets.only(bottom: 30), // Add padding to the bottom
+            padding: EdgeInsets.only(bottom: 20),
             child: Column(
               children: [
                 Container(
@@ -101,10 +105,13 @@ class ProfileScreen extends StatelessWidget {
                   height: 50.0,
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=>EditPasswordScreen()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => EditPasswordScreen()));
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFFFE279), // Màu vàng
+                      backgroundColor: Color(0xFFFFE279),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -116,7 +123,7 @@ class ProfileScreen extends StatelessWidget {
                             fontWeight: FontWeight.bold)),
                   ),
                 ),
-                SizedBox(height: 20), // Add space between buttons
+                SizedBox(height: 20),
                 Container(
                   margin: EdgeInsets.symmetric(horizontal: 16),
                   width: double.infinity,
@@ -124,7 +131,7 @@ class ProfileScreen extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFFFE279), // Màu vàng
+                      backgroundColor: Color(0xFFFFE279),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -159,7 +166,7 @@ class ProfileDetailRow extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 100, // Đặt một chiều rộng cố định cho phần tiêu đề
+            width: 100,
             child: Text(
               '$title:',
               style: TextStyle(
