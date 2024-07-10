@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 class FavoriteScreen extends StatefulWidget {
@@ -17,11 +18,14 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
 
   Future<void> _loadProducts() async {
     try {
-      String data = await DefaultAssetBundle.of(context).loadString('assets/file/shoe_data.json');
+      String data = await DefaultAssetBundle.of(context)
+          .loadString('assets/file/shoe_data.json');
       final jsonResult = json.decode(data);
       print('Data loaded: $jsonResult');
       setState(() {
-        products = (jsonResult['shoes'] as List).map((e) => Product.fromJson(e)).toList();
+        products = (jsonResult['shoes'] as List)
+            .map((e) => Product.fromJson(e))
+            .toList();
       });
     } catch (e) {
       print('Error loading JSON: $e');
@@ -32,29 +36,63 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFF6699CC),
+      appBar: AppBar(
+        backgroundColor: Color(0xFF6699CC),
+        leading: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
+          child: InkWell(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            splashColor: Color(0xFF6699CC),
+            hoverColor: Color(0xFF6699CC),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
+              child: Icon(Icons.arrow_back_ios, size: 20),
+            ),
+          ),
+        ),
+        title: Padding(
+          padding: const EdgeInsets.only(top: 22),
+          child: Center(
+            child: Text(
+              'Yêu thích',
+              style: TextStyle(
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 16, 16, 0),
+            child: InkWell(
+              onTap: () {},
+              splashColor: Color(0xFF6699CC),
+              hoverColor: Color(0xFF6699CC),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(Icons.favorite, size: 20),
+              ),
+            ),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.arrow_back),
-                    onPressed: () {},
-                  ),
-                  Text(
-                    'Yêu thích',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.favorite),
-                    onPressed: () {},
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
               Expanded(
                 child: products.isNotEmpty
                     ? GridView.builder(
@@ -62,7 +100,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                           crossAxisCount: 2,
                           crossAxisSpacing: 16,
                           mainAxisSpacing: 16,
-                          childAspectRatio: 0.75,
+                          childAspectRatio: 0.8,
                         ),
                         itemCount: products.length,
                         itemBuilder: (context, index) {
@@ -89,57 +127,65 @@ class ProductCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: Offset(0, 3),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(20.0),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Align(
-              alignment: Alignment.topRight,
-              child: Icon(Icons.favorite_border, color: Colors.red),
-            ),
-            Center(
-              child: Image.network(
-                product.imageUrl,
-                height: 80,
-                fit: BoxFit.cover,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Stack(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(top: 10),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(10.0),
+                    topRight: Radius.circular(10.0),
+                  ),
+                  child: Image.network(
+                    product.imageUrl,
+                    height: 120,
+                    width: double.infinity,
+                    fit: BoxFit.contain,
+                  ),
+                ),
               ),
-            ),
-            SizedBox(height: 10),
-            Text(
-              'THỊNH HÀNH',
-              style: TextStyle(color: Colors.grey, fontSize: 12),
-            ),
-            SizedBox(height: 4),
-            Text(
-              product.name,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+              Positioned(
+                left: 12.0,
+                top: 12.0,
+                child: Icon(Icons.favorite, color: Colors.red),
               ),
-            ),
-            SizedBox(height: 4),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(
+                  product.label,
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8.0),
+                Text(
+                  product.name,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8.0),
                 Text(
                   product.price,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.blue,
                   ),
                 ),
+                SizedBox(height: 8.0),
                 Row(
                   children: product.colors
                       .map((color) => Container(
@@ -155,20 +201,22 @@ class ProductCard extends StatelessWidget {
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
 
 class Product {
+  final String label;
   final String name;
   final String price;
   final String imageUrl;
   final List<Color> colors;
 
   Product({
+    required this.label,
     required this.name,
     required this.price,
     required this.imageUrl,
@@ -177,6 +225,7 @@ class Product {
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
+      label: json['label'],
       name: json['title'],
       price: '${json['price']}đ',
       imageUrl: json['image'],
