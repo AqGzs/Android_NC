@@ -1,6 +1,6 @@
-import 'dart:convert';
-
+import 'package:dio/dio.dart'; // Add Dio package for HTTP requests
 import 'package:flutter/material.dart';
+import 'package:flutter_doanlt/data/Model/shoe.dart'; // Import Shoe model
 import 'package:flutter_doanlt/favorite/favorite.dart';
 import 'package:flutter_doanlt/notification/notification.dart';
 import 'package:flutter_doanlt/page/cart_screen.dart';
@@ -13,15 +13,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String selectedCategory = '';
-  List<dynamic> products = [];
   int _currentIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadProducts();
-  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -36,32 +28,6 @@ class _HomePageState extends State<HomePage> {
     NotificationScreen(),
     ProfileScreen(),
   ];
-
-  void selectCategory(String category) {
-    setState(() {
-      selectedCategory = category;
-    });
-  }
-
-  Future<void> _loadProducts() async {
-    try {
-      String data = await DefaultAssetBundle.of(context).loadString('assets/file/shoe_data.json');
-      final jsonResult = json.decode(data);
-      print('Data loaded: $jsonResult');
-      setState(() {
-        products = jsonResult['shoes'];
-      });
-    } catch (e) {
-      print('Error loading JSON: $e');
-    }
-  }
-
-  // void _navigateToDetailScreen(Map<String, dynamic> product) {
-  //   Navigator.push(
-  //     context,
-  //     MaterialPageRoute(builder: (context) => ProductDetailScreen(product: product)),
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +109,8 @@ class HomePageBody extends StatefulWidget {
 
 class _HomePageBodyState extends State<HomePageBody> {
   String selectedCategory = '';
-  List<dynamic> products = [];
+  List<Shoe> products = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -159,28 +126,31 @@ class _HomePageBodyState extends State<HomePageBody> {
 
   Future<void> _loadProducts() async {
     try {
-      String data = await DefaultAssetBundle.of(context).loadString('assets/file/shoe_data.json');
-      final jsonResult = json.decode(data);
-      print('Data loaded: $jsonResult');
+      var response = await Dio().get('http://192.168.1.181:3000/api/shoes'); // Replace with your API URL
+      List<dynamic> data = response.data;
+      List<Shoe> loadedProducts = data.map((json) => Shoe.fromJson(json)).toList();
+
       setState(() {
-        products = jsonResult['shoes'];
+        products = loadedProducts;
+        isLoading = false;
       });
     } catch (e) {
-      print('Error loading JSON: $e');
+      print('Error loading products: $e');
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
-  // void _navigateToDetailScreen(Map<String, dynamic> product) {
-  //   Navigator.push(
-  //     context,
-  //     MaterialPageRoute(builder: (context) => ProductDetailScreen(shoe: Shoe)),
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
-    return products.isNotEmpty
-        ? CustomScrollView(
+    List<Shoe> allShoes = products.take(5).toList();
+    List<Shoe> newShoes = List.from(products);
+    newShoes.sort((a, b) => b.createdAt.compareTo(a.createdAt)); // Ensure you have createdAt field in Shoe model
+
+    return isLoading
+        ? Center(child: CircularProgressIndicator())
+        : CustomScrollView(
             slivers: [
               SliverAppBar(
                 pinned: true,
@@ -249,13 +219,15 @@ class _HomePageBodyState extends State<HomePageBody> {
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
-                          children: products.map((product) {
+                          children: allShoes.map((shoe) {
                             return GestureDetector(
-                              //onTap: () => _navigateToDetailScreen(product),
+                              onTap: () {
+                                // Implement navigation to detail screen
+                              },
                               child: ProductCard(
-                                imagePath: product['image'],
-                                name: product['title'],
-                                price: '${product['price']}đ',
+                                imagePath: shoe.imageUrl,
+                                name: shoe.name,
+                                price: '${shoe.price}đ',
                               ),
                             );
                           }).toList(),
@@ -275,13 +247,15 @@ class _HomePageBodyState extends State<HomePageBody> {
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
-                          children: products.map((product) {
+                          children: newShoes.map((shoe) {
                             return GestureDetector(
-                              //onTap: () => _navigateToDetailScreen(product),
+                              onTap: () {
+                                // Implement navigation to detail screen
+                              },
                               child: ProductCard1(
-                                imagePath: product['image'],
-                                name: product['title'],
-                                price: '${product['price']}đ',
+                                imagePath: shoe.imageUrl,
+                                name: shoe.name,
+                                price: '${shoe.price}đ',
                               ),
                             );
                           }).toList(),
@@ -292,8 +266,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                 ),
               ),
             ],
-          )
-        : Center(child: CircularProgressIndicator());
+          );
   }
 }
 
@@ -391,7 +364,7 @@ class ProductCard extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius:
                           BorderRadius.vertical(top: Radius.circular(20.0)),
-                      child: Image.asset(
+                      child: Image.network(
                         imagePath,
                         fit: BoxFit.cover,
                         width: double.infinity,
@@ -545,7 +518,7 @@ class ProductCard1 extends StatelessWidget {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(20.0),
-                        child: Image.asset(
+                        child: Image.network(
                           imagePath,
                           fit: BoxFit.contain,
                           height: 130.0,
