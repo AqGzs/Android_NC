@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_doanlt/api_service/auth_service.dart';
 import 'package:flutter_doanlt/page/resetpassword_screen.dart';
 import 'package:flutter_doanlt/page/trangchu.dart';
+
 import 'signup.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -18,52 +19,54 @@ class _SignInScreenState extends State<SignInScreen> {
   final AuthService _authService = AuthService();
   String? _token;
   String? _userId;
-Future<void> _login() async {
-  if (_formKey.currentState?.validate() ?? false) {
-    setState(() {
-      _isLoading = true;
-    });
 
-    try {
-      final Map<String, dynamic> response = await _authService.login(
-        _emailController.text,
-        _passwordController.text,
-      );
-
-      if (response.containsKey('token') && response.containsKey('userId')) {
-        setState(() {
-          _token = response['token'];
-          _userId = response['userId'];
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Đăng nhập thành công')),
-        );
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HomePage(
-              token: _token!,
-              userId: _userId!,
-            ),
-          ),
-        );
-      } else {
-        throw Exception('Đăng nhập thất bại');
-      }
-    } catch (error) {
-      print('Error during login: $error'); // Log the error
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Đăng nhập thất bại: $error')),
-      );
-    } finally {
+  Future<void> _login() async {
+    if (_formKey.currentState?.validate() ?? false) {
       setState(() {
-        _isLoading = false;
+        _isLoading = true;
       });
+
+      try {
+        final Map<String, dynamic> response = await _authService.login(
+          _emailController.text,
+          _passwordController.text,
+        );
+
+        if (response.containsKey('token') && response.containsKey('userId')) {
+          setState(() {
+            _token = response['token'];
+            _userId = response['userId'];
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Đăng nhập thành công')),
+          );
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomePage(
+                token: _token!,
+                userId: _userId!,
+              ),
+            ),
+          );
+        } else {
+          throw Exception('Đăng nhập thất bại');
+        }
+      } catch (error) {
+        print('Error during login: $error'); // Log the error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Đăng nhập thất bại: $error')),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
-}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -133,7 +136,8 @@ Future<void> _login() async {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => ResetPasswordScreen()),
+                          builder: (context) => ResetPasswordScreen(),
+                        ),
                       );
                     },
                     child: Text(
@@ -158,9 +162,10 @@ Future<void> _login() async {
                       child: Text(
                         'Đăng nhập',
                         style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold),
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
               SizedBox(height: 20),
@@ -174,14 +179,14 @@ Future<void> _login() async {
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                icon:
-                    Image.asset('assets/images/logo_google.png', height: 24),
+                icon: Image.asset('assets/images/logo_google.png', height: 24),
                 label: Text(
                   'Đăng nhập với Google',
                   style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold),
+                    color: Colors.black,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               Spacer(),
@@ -198,9 +203,11 @@ Future<void> _login() async {
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => SignUpScreen()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SignUpScreen(),
+                        ),
+                      );
                     },
                     child: Text(
                       ' Đăng ký ngay',

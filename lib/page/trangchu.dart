@@ -1,5 +1,6 @@
-import 'dart:convert';
+import 'package:dio/dio.dart'; // Add Dio package for HTTP requests
 import 'package:flutter/material.dart';
+import 'package:flutter_doanlt/data/Model/shoe.dart'; // Import Shoe model
 import 'package:flutter_doanlt/detail/productDetailScreen.dart';
 import 'package:flutter_doanlt/favorite/favorite.dart';
 import 'package:flutter_doanlt/notification/notification.dart';
@@ -83,6 +84,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
 class HomePageContent extends StatelessWidget {
   final String token;
   final String userId;
@@ -163,7 +165,8 @@ class HomePageBody extends StatefulWidget {
 
 class _HomePageBodyState extends State<HomePageBody> {
   String selectedCategory = '';
-  List<dynamic> products = [];
+  List<Shoe> products = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -179,23 +182,26 @@ class _HomePageBodyState extends State<HomePageBody> {
 
   Future<void> _loadProducts() async {
     try {
-      String data = await DefaultAssetBundle.of(context)
-          .loadString('assets/file/shoe_data.json');
-      final jsonResult = json.decode(data);
-      print('Data loaded: $jsonResult');
+      var response = await Dio().get('http://192.168.1.181:3000/api/shoes'); // Replace with your API URL
+      List<dynamic> data = response.data;
+      List<Shoe> loadedProducts = data.map((json) => Shoe.fromJson(json)).toList();
       setState(() {
-        products = jsonResult['shoes'];
+        products = loadedProducts;
+        isLoading = false;
       });
     } catch (e) {
-      print('Error loading JSON: $e');
+      print('Error loading products: $e');
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
-  void _navigateToDetailScreen(Map<String, dynamic> product) {
+  void _navigateToDetailScreen(Shoe shoe) {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => ProductDetailScreen(product: product)),
+          builder: (context) => ProductDetailScreen(shoe: shoe)),
     );
   }
 
@@ -293,13 +299,13 @@ class _HomePageBodyState extends State<HomePageBody> {
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
-                            children: products.map((product) {
+                            children: products.map((shoe) {
                               return GestureDetector(
-                                onTap: () => _navigateToDetailScreen(product),
+                                onTap: () => _navigateToDetailScreen(shoe),
                                 child: ProductCard(
-                                  imagePath: product['image'],
-                                  name: product['title'],
-                                  price: '${product['price']}đ',
+                                  imagePath: shoe.imageUrl,
+                                  name: shoe.name,
+                                  price: '${shoe.price}đ',
                                 ),
                               );
                             }).toList(),
@@ -320,13 +326,13 @@ class _HomePageBodyState extends State<HomePageBody> {
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
-                            children: products.map((product) {
+                            children: products.map((shoe) {
                               return GestureDetector(
-                                onTap: () => _navigateToDetailScreen(product),
+                                onTap: () => _navigateToDetailScreen(shoe),
                                 child: ProductCard1(
-                                  imagePath: product['image'],
-                                  name: product['title'],
-                                  price: '${product['price']}đ',
+                                  imagePath: shoe.imageUrl,
+                                  name: shoe.name,
+                                  price: '${shoe.price}đ',
                                 ),
                               );
                             }).toList(),
@@ -508,7 +514,7 @@ class ProductCard extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius:
                           BorderRadius.vertical(top: Radius.circular(20.0)),
-                      child: Image.asset(
+                      child: Image.network(
                         imagePath,
                         fit: BoxFit.cover,
                         width: double.infinity,
@@ -662,7 +668,7 @@ class ProductCard1 extends StatelessWidget {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(20.0),
-                        child: Image.asset(
+                        child: Image.network(
                           imagePath,
                           fit: BoxFit.contain,
                           height: 130.0,

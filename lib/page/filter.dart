@@ -1,22 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_doanlt/data/ApiService.dart';
+import 'package:flutter_doanlt/data/Model/shoe.dart';
 import 'package:intl/intl.dart'; 
 class FilterSheet extends StatefulWidget {
+  final Function(List<Shoe>) onFilterApplied;
+
+  FilterSheet({required this.onFilterApplied});
+
   @override
   _FilterSheetState createState() => _FilterSheetState();
 }
 
 class _FilterSheetState extends State<FilterSheet> {
-  String gender = 'Nam';
   int size = 41;
   RangeValues priceRange = RangeValues(50000, 350000);
   final NumberFormat currencyFormatter = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
 
   void resetFilters() {
     setState(() {
-      gender = 'Nam';
       size = 41;
       priceRange = RangeValues(50000, 350000);
     });
+  }
+
+  void applyFilters() async {
+    ApiService apiService = ApiService();
+    List<Shoe> filteredShoes = await apiService.getShoes(
+      size: size,
+      minPrice: priceRange.start.toInt(),
+      maxPrice: priceRange.end.toInt(),
+    );
+    widget.onFilterApplied(filteredShoes);
+    Navigator.pop(context);
   }
 
   @override
@@ -45,44 +60,6 @@ class _FilterSheetState extends State<FilterSheet> {
             ],
           ),
           SizedBox(height: 20.0),
-          Text('Giới tính', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-          SizedBox(height: 10.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              ChoiceChip(
-                label: Text('Nam'),
-                selected: gender == 'Nam',
-                selectedColor: Color(0xFF6699CC),
-                onSelected: (selected) {
-                  setState(() {
-                    gender = 'Nam';
-                  });
-                },
-              ),
-              ChoiceChip(
-                label: Text('Nữ'),
-                selected: gender == 'Nữ',
-                selectedColor: Color(0xFF6699CC),
-                onSelected: (selected) {
-                  setState(() {
-                    gender = 'Nữ';
-                  });
-                },
-              ),
-              ChoiceChip(
-                label: Text('Unisex'),
-                selected: gender == 'Unisex',
-                selectedColor: Color(0xFF6699CC),
-                onSelected: (selected) {
-                  setState(() {
-                    gender = 'Unisex';
-                  });
-                },
-              ),
-            ],
-          ),
-          SizedBox(height: 20.0),
           Text('Kích cỡ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
           SizedBox(height: 10.0),
           Wrap(
@@ -104,7 +81,7 @@ class _FilterSheetState extends State<FilterSheet> {
           SizedBox(height: 20.0),
           Text('Mức giá', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
           RangeSlider(
-            activeColor: Color(0xFF6699CC), // Set the active color to blue
+            activeColor: Color(0xFF6699CC),
             values: priceRange,
             min: 50000,
             max: 350000,
@@ -121,10 +98,7 @@ class _FilterSheetState extends State<FilterSheet> {
           ),
           SizedBox(height: 20.0),
           ElevatedButton(
-            onPressed: () {
-              // Xử lý dữ liệu lọc và đóng modal
-              Navigator.pop(context);
-            },
+            onPressed: applyFilters,
             style: ElevatedButton.styleFrom(
               backgroundColor: Color(0xFF6699CC),
               minimumSize: Size(double.infinity, 50),
@@ -137,4 +111,3 @@ class _FilterSheetState extends State<FilterSheet> {
     );
   }
 }
-

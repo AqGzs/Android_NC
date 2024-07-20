@@ -36,6 +36,10 @@ class CartScreen extends StatelessWidget {
     final int discount = 40900;
     final int finalAmount = totalAmount - discount;
 
+    // Giả sử bạn có các giá trị token và userId
+    String token = "example_token";
+    String userId = "example_userId";
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xFF6699CC),
@@ -128,7 +132,7 @@ class CartScreen extends StatelessWidget {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => CheckoutScreen()));
+                              builder: (context) => CheckoutScreen(token: token, userId: userId)));
                     },
                     child: Text('Đặt hàng',
                         style: TextStyle(
@@ -151,3 +155,4 @@ class CartScreen extends StatelessWidget {
     );
   }
 }
+

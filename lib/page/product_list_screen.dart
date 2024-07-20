@@ -1,18 +1,17 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_doanlt/detail/productDetailScreen.dart';
+import 'package:flutter_doanlt/data/ApiService.dart';
+import 'package:flutter_doanlt/data/Model/shoe.dart';
 import 'package:flutter_doanlt/page/filter.dart';
 import 'package:flutter_doanlt/page/product_card.dart';
 import 'package:flutter_doanlt/page/search.dart';
-
 class ProductListScreen extends StatefulWidget {
   @override
   _ProductListScreenState createState() => _ProductListScreenState();
 }
 
 class _ProductListScreenState extends State<ProductListScreen> {
-  List<dynamic> products = [];
+  List<Shoe> shoes = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -21,24 +20,35 @@ class _ProductListScreenState extends State<ProductListScreen> {
   }
 
   Future<void> _loadProducts() async {
+    ApiService apiService = ApiService();
     try {
-      String data = await DefaultAssetBundle.of(context)
-          .loadString('assets/file/shoe_data.json');
-      final jsonResult = json.decode(data);
-      print('Data loaded: $jsonResult');
+      List<Shoe> fetchedShoes = await apiService.getShoes();
       setState(() {
-        products = jsonResult['shoes'];
+        shoes = fetchedShoes;
+        isLoading = false;
       });
     } catch (e) {
-      print('Error loading JSON: $e');
+      print('Error loading products: $e');
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
-  void _navigateToDetailScreen(Map<String, dynamic> product) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => ProductDetailScreen(product: product)),
+  void _openFilterSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return FilterSheet(onFilterApplied: (filteredShoes) {
+          setState(() {
+            shoes = filteredShoes;
+          });
+        });
+      },
     );
   }
 
@@ -103,17 +113,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(0, 16, 16, 0),
             child: InkWell(
-              onTap: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(20)),
-                  ),
-                  builder: (context) => FilterSheet(),
-                );
-              },
+              onTap: _openFilterSheet,
               splashColor: Color(0xFF6699CC),
               hoverColor: Color(0xFF6699CC),
               child: Container(
@@ -132,21 +132,23 @@ class _ProductListScreenState extends State<ProductListScreen> {
         padding: EdgeInsets.only(top: 16),
         child: Container(
           color: Color(0xFF6699CC),
-          child: products.isNotEmpty
-              ? GridView.builder(
-                  padding: EdgeInsets.all(16.0),
-                  itemCount: products.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 0.8,
-                  ),
-                  itemBuilder: (context, index) {
-                    return ProductCard(product: products[index]);
-                  },
-                )
-              : Center(child: CircularProgressIndicator()),
+          child: isLoading
+              ? Center(child: CircularProgressIndicator())
+              : shoes.isNotEmpty
+                  ? GridView.builder(
+                      padding: EdgeInsets.all(16.0),
+                      itemCount: shoes.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: 0.8,
+                      ),
+                      itemBuilder: (context, index) {
+                        return ProductCard(shoe: shoes[index]);
+                      },
+                    )
+                  : Center(child: Text('Không tìm thấy sản phẩm')),
         ),
       ),
     );
