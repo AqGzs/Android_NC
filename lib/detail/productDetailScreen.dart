@@ -172,11 +172,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         return GestureDetector(
                           onTap: () {
                             setState(() {
-                              selectedSize = size.toString();
+                              selectedSize = size.toString();  // Chuyển đổi int thành String
                             });
                           },
                           child: SizeOption(
-                            size.toString(),
+                            size.toString(),  // Chuyển đổi int thành String
                             isSelected: selectedSize == size.toString(),
                           ),
                         );

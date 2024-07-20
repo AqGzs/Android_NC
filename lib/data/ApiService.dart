@@ -10,6 +10,13 @@ class ApiService {
       'Accept': 'application/json',
     },
   ));
+   Future<void> addToFavorites(String userId, String shoeId) async {
+    try {
+      await _dio.post('/favorites', data: {'userId': userId, 'shoeId': shoeId});
+    } catch (e) {
+      throw Exception('Failed to add to favorites: $e');
+    }
+  }
  Future<List<Shoe>> getShoes({int? size, int? minPrice, int? maxPrice}) async {
     try {
       final response = await _dio.get('/shoes', queryParameters: {
@@ -55,6 +62,7 @@ class ApiService {
       throw Exception('Failed to create shoe: $error');
     }
   }
+
 
   Future<Shoe> updateShoe(int id, Shoe shoe) async {
     try {
@@ -114,6 +122,8 @@ class ApiService {
       throw Exception('Failed to register: $error');
     }
   }
+  
 }
+
 
 

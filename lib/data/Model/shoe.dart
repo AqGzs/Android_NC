@@ -7,6 +7,7 @@ class Shoe {
   final List<Map<String, int>> stocks;
   final List<String> colors;
   final String imageUrl;
+  final DateTime createdAt;
 
   Shoe({
     required this.id,
@@ -17,23 +18,21 @@ class Shoe {
     required this.stocks,
     required this.colors,
     required this.imageUrl,
+    required this.createdAt,
   });
 
   factory Shoe.fromJson(Map<String, dynamic> json) {
-    // Chuyển đổi kích cỡ từ String sang int
     List<int> sizes = [];
     if (json['sizes'] != null) {
       sizes = (json['sizes'] as List).map((size) => int.tryParse(size.toString()) ?? 0).toList();
     }
-    
-    // Chuyển đổi stocks đúng cách
+
     List<Map<String, int>> stocks = [];
     if (json['stocks'] != null) {
       stocks = (json['stocks'] as List).map((stock) {
-        return {
-          'size': int.tryParse(stock['size'].toString()) ?? 0,
-          'quantity': int.tryParse(stock['quantity'].toString()) ?? 0,
-        };
+        int size = int.tryParse(stock['size']?.toString() ?? '0') ?? 0;
+        int quantity = int.tryParse(stock['quantity']?.toString() ?? '0') ?? 0;
+        return {'size': size, 'quantity': quantity};
       }).toList();
     }
 
@@ -42,10 +41,11 @@ class Shoe {
       name: json['name'] as String,
       brand: json['brand'] as String,
       sizes: sizes,
-      price: int.tryParse(json['price'].toString()) ?? 0,
+      price: int.tryParse(json['price']?.toString() ?? '0') ?? 0,
       stocks: stocks,
       colors: (json['colors'] as List).map((color) => color as String).toList(),
       imageUrl: json['imageUrl'] as String,
+      createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
     );
   }
 
@@ -59,10 +59,12 @@ class Shoe {
       'stocks': stocks,
       'colors': colors,
       'imageUrl': imageUrl,
+      'createdAt': createdAt.toIso8601String(),
     };
   }
 
   bool get isOutOfStock {
-    return stocks.fold(0, (sum, stock) => sum + (stock['quantity'] ?? 0)) == 0;
+    return stocks.fold(0, (sum, stock) => sum + stock['quantity']!) == 0;
   }
 }
+
