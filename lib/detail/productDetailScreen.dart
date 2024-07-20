@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_doanlt/data/Model/shoe.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  final Map<String, dynamic> product;
+  final Shoe shoe;
 
-  ProductDetailScreen({required this.product});
+  ProductDetailScreen({required this.shoe});
 
   @override
   _ProductDetailScreenState createState() => _ProductDetailScreenState();
@@ -16,8 +17,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   void initState() {
     super.initState();
-    selectedColor = widget.product['colors'][0];
-    selectedSize = widget.product['sizes'][0].toString();
+    selectedColor = widget.shoe.colors.isNotEmpty ? widget.shoe.colors[0] : '';
+    selectedSize = widget.shoe.sizes.isNotEmpty ? widget.shoe.sizes[0].toString() : '';
   }
 
   @override
@@ -82,7 +83,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             color: Color(0xFF6699CC),
             padding: const EdgeInsets.all(16.0),
             child: Center(
-              child: Image.asset(widget.product['image'],
+              child: Image.network(widget.shoe.imageUrl,
                   height: 180, fit: BoxFit.cover),
             ),
           ),
@@ -98,7 +99,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.product['label'],
+                      widget.shoe.brand,
                       style: TextStyle(
                         color: Color(0xFF5B9EE1),
                         fontSize: 16.0,
@@ -107,7 +108,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ),
                     SizedBox(height: 8),
                     Text(
-                      widget.product['title'],
+                      widget.shoe.name,
                       style: TextStyle(
                         fontSize: 22.0,
                         fontWeight: FontWeight.bold,
@@ -116,7 +117,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ),
                     SizedBox(height: 8),
                     Text(
-                      'Còn hàng',
+                      widget.shoe.isOutOfStock ? 'Hết hàng' : 'Còn hàng',
                       style: TextStyle(
                         fontSize: 18.0,
                         color: Colors.black,
@@ -141,7 +142,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ),
                     SizedBox(height: 8),
                     Row(
-                      children: widget.product['colors'].map<Widget>((color) {
+                      children: widget.shoe.colors.map<Widget>((color) {
                         return GestureDetector(
                           onTap: () {
                             setState(() {
@@ -167,7 +168,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     SizedBox(height: 8),
                     Wrap(
                       spacing: 8.0,
-                      children: widget.product['sizes'].map<Widget>((size) {
+                      children: widget.shoe.sizes.map<Widget>((size) {
                         return GestureDetector(
                           onTap: () {
                             setState(() {
@@ -197,7 +198,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               ),
                             ),
                             Text(
-                              '${widget.product['price']}đ',
+                              '${widget.shoe.price}đ',
                               style: TextStyle(
                                 fontSize: 18.0,
                                 fontWeight: FontWeight.normal,
@@ -238,7 +239,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Color _getColor(String color) {
-    switch (color) {
+    switch (color.toLowerCase()) {
+      case 'black':
+        return Colors.black;
+      case 'white':
+        return Colors.white;
+      case 'yellow':
+        return Colors.yellow;
       case 'blue':
         return Colors.blue;
       case 'green':
@@ -256,7 +263,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       case 'amber':
         return Colors.amber;
       default:
-        return Colors.white;
+        return Colors.transparent;
     }
   }
 }

@@ -153,7 +153,7 @@ class CheckoutScreen extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => HomePage()));
+                      MaterialPageRoute(builder: (context) => HomePageBody()));
                 },
                 child: Text('Tiếp tục mua sắm',
                     style:

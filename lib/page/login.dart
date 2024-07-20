@@ -84,7 +84,7 @@ class _SignInScreenState extends State<SignInScreen> {
             ElevatedButton(
               onPressed: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => HomePage()));
+                    MaterialPageRoute(builder: (context) => HomePageBody()));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFFFFE279),

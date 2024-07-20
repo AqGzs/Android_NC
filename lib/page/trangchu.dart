@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_doanlt/detail/productDetailScreen.dart';
 import 'package:flutter_doanlt/favorite/favorite.dart';
 import 'package:flutter_doanlt/notification/notification.dart';
 import 'package:flutter_doanlt/page/cart_screen.dart';
@@ -57,12 +56,12 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _navigateToDetailScreen(Map<String, dynamic> product) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => ProductDetailScreen(product: product)),
-    );
-  }
+  // void _navigateToDetailScreen(Map<String, dynamic> product) {
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(builder: (context) => ProductDetailScreen(product: product)),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -171,12 +170,12 @@ class _HomePageBodyState extends State<HomePageBody> {
     }
   }
 
-  void _navigateToDetailScreen(Map<String, dynamic> product) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => ProductDetailScreen(product: product)),
-    );
-  }
+  // void _navigateToDetailScreen(Map<String, dynamic> product) {
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(builder: (context) => ProductDetailScreen(shoe: Shoe)),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -238,7 +237,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                       ),
                       SizedBox(height: 16.0),
                       SectionTitle(
-                        title: 'Nổi Bật',
+                        title: 'Tất cả giày',
                         onViewAll: () {
                           Navigator.push(
                             context,
@@ -252,7 +251,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                         child: Row(
                           children: products.map((product) {
                             return GestureDetector(
-                              onTap: () => _navigateToDetailScreen(product),
+                              //onTap: () => _navigateToDetailScreen(product),
                               child: ProductCard(
                                 imagePath: product['image'],
                                 name: product['title'],
@@ -278,7 +277,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                         child: Row(
                           children: products.map((product) {
                             return GestureDetector(
-                              onTap: () => _navigateToDetailScreen(product),
+                              //onTap: () => _navigateToDetailScreen(product),
                               child: ProductCard1(
                                 imagePath: product['image'],
                                 name: product['title'],

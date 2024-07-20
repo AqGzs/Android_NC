@@ -1,105 +1,118 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_doanlt/data/Model/shoe.dart';
+import 'package:flutter_doanlt/detail/productDetailScreen.dart';
 class ProductCard extends StatelessWidget {
-  final Map<String, dynamic> product;
+  final Shoe shoe;
 
-  ProductCard({required this.product});
+  ProductCard({required this.shoe});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20.0),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(top: 10),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(10.0),
-                    topRight: Radius.circular(10.0),
-                  ),
-                  child: Image.asset(
-                    product['image'],
-                    height: 120,
-                    width: double.infinity,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 12.0,
-                top: 12.0,
-                child: FavoriteButton(),
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ProductDetailScreen(shoe: shoe)),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
               children: [
-                Text(
-                  product['label'],
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
+                Padding(
+                  padding: EdgeInsets.only(top: 10),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(10.0),
+                      topRight: Radius.circular(10.0),
+                    ),
+                    child: Image.network(
+                      shoe.imageUrl,
+                      height: 100,
+                      width: double.infinity,
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ),
-                SizedBox(height: 6.0),
-                Text(
-                  product['title'],
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 6.0),
-                Text(
-                  product['gender'],
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
-                ),
-                SizedBox(height: 8.0),
-                Text(
-                  '${product['price']}đ',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 8.0),
-                Row(
-                  children: (product['colors'] as List).map<Widget>((color) {
-                    return Container(
-                      margin: EdgeInsets.only(right: 4.0),
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: _getColorFromName(color),
-                        shape: BoxShape.circle,
-                      ),
-                    );
-                  }).toList(),
+                Positioned(
+                  right: 12.0,
+                  top: 12.0,
+                  child: FavoriteButton(),
                 ),
               ],
             ),
-          ),
-        ],
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      shoe.brand,
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 4.0),
+                    Text(
+                      shoe.name,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 4.0),
+                    Text(
+                      shoe.isOutOfStock ? 'Hết hàng' : 'Còn hàng',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    SizedBox(height: 4.0),
+                    Text(
+                      '${shoe.price}đ',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 4.0),
+                    Wrap(
+                      spacing: 4.0,
+                      runSpacing: 4.0,
+                      children: shoe.colors.map<Widget>((color) {
+                        return Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: _getColorFromName(color),
+                            shape: BoxShape.circle,
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Color _getColorFromName(String colorName) {
-    switch (colorName) {
+    switch (colorName.toLowerCase()) {
       case 'blue':
         return Colors.blue;
       case 'green':
@@ -110,8 +123,14 @@ class ProductCard extends StatelessWidget {
         return Colors.red;
       case 'orange':
         return Colors.orange;
-      default:
+      case 'black':
         return Colors.black;
+      case 'white':
+        return Colors.white;
+      case 'yellow':
+        return Colors.yellow;
+      default:
+        return Colors.transparent;
     }
   }
 }
@@ -134,10 +153,9 @@ class _FavoriteButtonState extends State<FavoriteButton> {
       },
       child: Icon(
         _isFavorite ? Icons.favorite : Icons.favorite_border,
-        size: 30.0,
+        size: 24.0,
         color: _isFavorite ? Colors.red : Colors.black,
       ),
     );
   }
 }
-
