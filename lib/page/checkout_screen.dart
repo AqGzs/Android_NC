@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_doanlt/page/trangchu.dart';
 
 class CheckoutScreen extends StatelessWidget {
+  // Thêm các biến token và userId vào đây
+  final String token;
+  final String userId;
+
+  // Sửa constructor để nhận token và userId
+  CheckoutScreen({required this.token, required this.userId});
+
   @override
   Widget build(BuildContext context) {
     final int totalAmount = 1250000;
@@ -153,7 +160,7 @@ class CheckoutScreen extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => HomePageBody()));
+                     MaterialPageRoute(builder: (context) => HomePage(token: token, userId: userId)));
                 },
                 child: Text('Tiếp tục mua sắm',
                     style:
@@ -285,4 +292,5 @@ class CheckoutScreen extends StatelessWidget {
     );
   }
 }
+
 

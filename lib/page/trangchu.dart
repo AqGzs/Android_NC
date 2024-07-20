@@ -1,13 +1,20 @@
 import 'package:dio/dio.dart'; // Add Dio package for HTTP requests
 import 'package:flutter/material.dart';
 import 'package:flutter_doanlt/data/Model/shoe.dart'; // Import Shoe model
+import 'package:flutter_doanlt/detail/productDetailScreen.dart';
 import 'package:flutter_doanlt/favorite/favorite.dart';
 import 'package:flutter_doanlt/notification/notification.dart';
+import 'package:flutter_doanlt/page/account_setting_screen.dart';
 import 'package:flutter_doanlt/page/cart_screen.dart';
 import 'package:flutter_doanlt/page/product_list_screen.dart';
-import 'package:flutter_doanlt/page/profile_screen.dart';
+import 'package:flutter_doanlt/page/search.dart';
 
 class HomePage extends StatefulWidget {
+  final String token;
+  final String userId;
+
+  HomePage({required this.token, required this.userId});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -19,15 +26,27 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _currentIndex = index;
     });
+    if (index == 4) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => AccountSettingScreen(token: widget.token, userId: widget.userId)),
+      );
+    }
   }
 
-  final List<Widget> _screens = [
-    HomePageContent(),
-    FavoriteScreen(),
-    CartScreen(),
-    NotificationScreen(),
-    ProfileScreen(),
-  ];
+  final List<Widget> _screens = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _screens.addAll([
+      HomePageContent(token: widget.token, userId: widget.userId),
+      FavoriteScreen(),
+      CartScreen(),
+      NotificationScreen(),
+      AccountSettingScreen(token: widget.token, userId: widget.userId),
+    ]);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,42 +86,79 @@ class _HomePageState extends State<HomePage> {
 }
 
 class HomePageContent extends StatelessWidget {
+  final String token;
+  final String userId;
+
+  HomePageContent({required this.token, required this.userId});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFF6699CC),
       appBar: AppBar(
         backgroundColor: Color(0xFF6699CC),
-        elevation: 0,
-        leading: Icon(Icons.menu),
-        title: Center(
-          child: Text(
-            'F5Store',
-            style: TextStyle(
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
+        leading: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
+          child: InkWell(
+            onTap: () {},
+            splashColor: Color(0xFF6699CC),
+            hoverColor: Color(0xFF6699CC),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              padding: const EdgeInsets.all(8.0),
+              child: Icon(Icons.grid_view_rounded, size: 20),
+            ),
+          ),
+        ),
+        title: Padding(
+          padding: const EdgeInsets.only(top: 20),
+          child: Center(
+            child: Text(
+              'F5Store',
+              style: TextStyle(
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
             ),
           ),
         ),
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: IconButton(
-              icon: Icon(Icons.shopping_cart),
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> CartScreen()));
+            padding: const EdgeInsets.fromLTRB(0, 16, 16, 0),
+            child: InkWell(
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => CartScreen()));
               },
+              splashColor: Color(0xFF6699CC),
+              hoverColor: Color(0xFF6699CC),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(Icons.shopping_bag_rounded, size: 20),
+              ),
             ),
           ),
         ],
       ),
-      body: HomePageBody(),
+      body: HomePageBody(token: token, userId: userId),
     );
   }
 }
 
 class HomePageBody extends StatefulWidget {
+  final String token;
+  final String userId;
+
+  HomePageBody({required this.token, required this.userId});
+
   @override
   _HomePageBodyState createState() => _HomePageBodyState();
 }
@@ -129,7 +185,6 @@ class _HomePageBodyState extends State<HomePageBody> {
       var response = await Dio().get('http://192.168.1.181:3000/api/shoes'); // Replace with your API URL
       List<dynamic> data = response.data;
       List<Shoe> loadedProducts = data.map((json) => Shoe.fromJson(json)).toList();
-
       setState(() {
         products = loadedProducts;
         isLoading = false;
@@ -142,164 +197,259 @@ class _HomePageBodyState extends State<HomePageBody> {
     }
   }
 
+  void _navigateToDetailScreen(Shoe shoe) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => ProductDetailScreen(shoe: shoe)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<Shoe> allShoes = products.take(5).toList();
-    List<Shoe> newShoes = List.from(products);
-    newShoes.sort((a, b) => b.createdAt.compareTo(a.createdAt)); // Ensure you have createdAt field in Shoe model
-
-    return isLoading
-        ? Center(child: CircularProgressIndicator())
-        : CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                pinned: true,
-                backgroundColor: Color(0xFF6699CC),
-                title: TextField(
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.search),
-                    hintText: 'Tìm kiếm',
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(35.0),
-                      borderSide: BorderSide.none,
+    return Padding(
+      padding: const EdgeInsets.only(top: 16.0),
+      child: products.isNotEmpty
+          ? CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  pinned: true,
+                  backgroundColor: Color(0xFF6699CC),
+                  automaticallyImplyLeading: false,
+                  title: TextField(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => SearchScreen()),
+                      );
+                    },
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.search),
+                      hintText: 'Tìm kiếm',
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(35.0),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 24.0),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          CategoryButton(
-                            iconPath: 'assets/images/logo_nike.png',
-                            isSelected: selectedCategory == 'Nike',
-                            onTap: () => selectCategory('Nike'),
-                          ),
-                          CategoryButton(
-                            iconPath: 'assets/images/logo_puma.png',
-                            isSelected: selectedCategory == 'Puma',
-                            onTap: () => selectCategory('Puma'),
-                          ),
-                          CategoryButton(
-                            iconPath: 'assets/images/logo_underarmour.png',
-                            isSelected: selectedCategory == 'Under Armour',
-                            onTap: () => selectCategory('Under Armour'),
-                          ),
-                          CategoryButton(
-                            iconPath: 'assets/images/logo_adidas.png',
-                            isSelected: selectedCategory == 'Adidas',
-                            onTap: () => selectCategory('Adidas'),
-                          ),
-                          CategoryButton(
-                            iconPath: 'assets/images/logo_converse.png',
-                            isSelected: selectedCategory == 'Converse',
-                            onTap: () => selectCategory('Converse'),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 16.0),
-                      SectionTitle(
-                        title: 'Tất cả giày',
-                        onViewAll: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => ProductListScreen()),
-                          );
-                        },
-                      ),
-                      SizedBox(height: 10.0),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: allShoes.map((shoe) {
-                            return GestureDetector(
-                              onTap: () {
-                                // Implement navigation to detail screen
-                              },
-                              child: ProductCard(
-                                imagePath: shoe.imageUrl,
-                                name: shoe.name,
-                                price: '${shoe.price}đ',
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 20.0),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              CategoryButton(
+                                iconPath: 'assets/images/logo_nike.png',
+                                label: 'Nike',
+                                isSelected: selectedCategory == 'Nike',
+                                onTap: () => selectCategory('Nike'),
                               ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                      SizedBox(height: 16.0),
-                      SectionTitle(
-                        title: 'Sản Phẩm Mới',
-                        onViewAll: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => ProductListScreen()),
-                          );
-                        },
-                      ),
-                      SizedBox(height: 10.0),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: newShoes.map((shoe) {
-                            return GestureDetector(
-                              onTap: () {
-                                // Implement navigation to detail screen
-                              },
-                              child: ProductCard1(
-                                imagePath: shoe.imageUrl,
-                                name: shoe.name,
-                                price: '${shoe.price}đ',
+                              SizedBox(width: 25.0),
+                              CategoryButton(
+                                iconPath: 'assets/images/logo_puma.png',
+                                label: 'Puma',
+                                isSelected: selectedCategory == 'Puma',
+                                onTap: () => selectCategory('Puma'),
                               ),
-                            );
-                          }).toList(),
+                              SizedBox(width: 25.0),
+                              CategoryButton(
+                                iconPath: 'assets/images/logo_underarmour.png',
+                                label: 'Underarmour',
+                                isSelected: selectedCategory == 'Under Armour',
+                                onTap: () => selectCategory('Under Armour'),
+                              ),
+                              SizedBox(width: 25.0),
+                              CategoryButton(
+                                iconPath: 'assets/images/logo_adidas.png',
+                                label: 'Adidas',
+                                isSelected: selectedCategory == 'Adidas',
+                                onTap: () => selectCategory('Adidas'),
+                              ),
+                              SizedBox(width: 25.0),
+                              CategoryButton(
+                                iconPath: 'assets/images/logo_converse.png',
+                                label: 'Converse',
+                                isSelected: selectedCategory == 'Converse',
+                                onTap: () => selectCategory('Converse'),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                        SizedBox(height: 16.0),
+                        SectionTitle(
+                          title: 'Nổi Bật',
+                          onViewAll: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ProductListScreen()),
+                            );
+                          },
+                        ),
+                        SizedBox(height: 10.0),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: products.map((shoe) {
+                              return GestureDetector(
+                                onTap: () => _navigateToDetailScreen(shoe),
+                                child: ProductCard(
+                                  imagePath: shoe.imageUrl,
+                                  name: shoe.name,
+                                  price: '${shoe.price}đ',
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                        SizedBox(height: 16.0),
+                        SectionTitle(
+                          title: 'Sản Phẩm Mới',
+                          onViewAll: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ProductListScreen()),
+                            );
+                          },
+                        ),
+                        SizedBox(height: 10.0),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: products.map((shoe) {
+                              return GestureDetector(
+                                onTap: () => _navigateToDetailScreen(shoe),
+                                child: ProductCard1(
+                                  imagePath: shoe.imageUrl,
+                                  name: shoe.name,
+                                  price: '${shoe.price}đ',
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
-          );
+              ],
+            )
+          : Center(child: CircularProgressIndicator()),
+    );
   }
 }
 
-class CategoryButton extends StatelessWidget {
+class CategoryButton extends StatefulWidget {
   final String iconPath;
+  final String label;
   final bool isSelected;
   final VoidCallback onTap;
 
   CategoryButton({
     required this.iconPath,
+    required this.label,
     required this.isSelected,
     required this.onTap,
   });
 
   @override
+  _CategoryButtonState createState() => _CategoryButtonState();
+}
+
+class _CategoryButtonState extends State<CategoryButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Offset> _offsetAnimation;
+  late Animation<double> _opacityAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    _offsetAnimation = Tween<Offset>(
+      begin: Offset(0.0, 0.0),
+      end: Offset(0.0, 0.0),
+    ).animate(_controller);
+    _opacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap,
+      onTap: () {
+        widget.onTap();
+        if (widget.isSelected) {
+          _controller.reverse();
+        } else {
+          _controller.forward();
+        }
+      },
       child: Container(
         padding: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
-          color: isSelected ? Color(0xFFFEB941) : Color(0xFFFFE279),
+          color: widget.isSelected ? Color(0xFFFEB941) : Colors.transparent,
           borderRadius: BorderRadius.circular(35.0),
-          border: Border.all(
-            color: isSelected ? Color(0xFFFEB941) : Color(0xFF6699CC),
-            width: 3.0,
-          ),
         ),
-        child: Column(
-          children: [
-            Image.asset(iconPath, width: 40.0, height: 40.0),
-          ],
-        ),
+        child: widget.isSelected
+            ? Row(
+                children: [
+                  Container(
+                    width: 50.0,
+                    height: 50.0,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(0xFFFFE279),
+                    ),
+                    child: Center(
+                      child: Image.asset(widget.iconPath,
+                          width: 35.0, height: 35.0),
+                    ),
+                  ),
+                  SizedBox(width: 8.0),
+                  FadeTransition(
+                    opacity: _opacityAnimation,
+                    child: Text(
+                      widget.label,
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              )
+            : Container(
+                width: 60.0,
+                height: 60.0,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color(0xFFFFE279),
+                ),
+                child: Center(
+                  child:
+                      Image.asset(widget.iconPath, width: 40.0, height: 40.0),
+                ),
+              ),
       ),
     );
   }
@@ -360,7 +510,7 @@ class ProductCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(top: 30.0),
+                    padding: EdgeInsets.only(top: 20.0),
                     child: ClipRRect(
                       borderRadius:
                           BorderRadius.vertical(top: Radius.circular(20.0)),
@@ -419,8 +569,8 @@ class ProductCard extends StatelessWidget {
                   },
                   splashColor: Colors.white,
                   child: Container(
-                    width: 50.0,
-                    height: 50.0,
+                    width: 45.0,
+                    height: 45.0,
                     decoration: BoxDecoration(
                       color: Colors.black,
                       borderRadius: BorderRadius.only(

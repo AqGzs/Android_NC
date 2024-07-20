@@ -182,10 +182,10 @@ class AccountListItem extends StatelessWidget {
   }
 }
 
-class User {
-  final String name;
-  final String role;
-  final String profileImageUrl;
+// class User {
+//   final String name;
+//   final String role;
+//   final String profileImageUrl;
 
-  User(this.name, this.role, this.profileImageUrl);
-}
+//   User(this.name, this.role, this.profileImageUrl);
+// }

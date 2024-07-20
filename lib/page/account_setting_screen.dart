@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_doanlt/page/profile_screen.dart';
+import 'package:flutter_doanlt/page/start.dart';
 
 class AccountSettingScreen extends StatelessWidget {
+  final String token;
+  final String userId;
+
+  AccountSettingScreen({required this.token, required this.userId});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -89,9 +95,11 @@ class AccountSettingScreen extends StatelessWidget {
                         trailing: Icon(Icons.arrow_forward_ios, size: 20),
                         onTap: () {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ProfileScreen()));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProfileScreen(token: token, userId: userId),
+                            ),
+                          );
                         },
                       ),
                     ),
@@ -171,7 +179,9 @@ class AccountSettingScreen extends StatelessWidget {
               ),
               Spacer(),
               ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => StartPage()));
+                },
                 style: ElevatedButton.styleFrom(
                   foregroundColor: Colors.black,
                   backgroundColor: Color(0xFFFFE279),
@@ -184,9 +194,10 @@ class AccountSettingScreen extends StatelessWidget {
                 label: Text(
                   'Đăng xuất',
                   style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold),
+                    color: Colors.black,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
