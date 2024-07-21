@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_doanlt/api_service/user_service.dart';
 import 'package:flutter_doanlt/models/user.dart';
+import 'package:flutter_doanlt/page/edit_profile_screen.dart'; // Import EditProfileScreen
 
 class ProfileScreen extends StatefulWidget {
   final String token;
@@ -51,7 +52,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         title: Padding(
-          padding: const EdgeInsets.only(top: 10),
+          padding: const EdgeInsets.only(top: 24),
           child: Center(
             child: Text(
               'Thông tin tài khoản',
@@ -63,6 +64,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
         ),
+         actions: [
+          IconButton(
+            icon: Icon(Icons.circle_outlined),
+            onPressed: () {
+           
+            },
+          ),
+        ],
+
       ),
       body: FutureBuilder<User>(
         future: userFuture,
@@ -100,6 +110,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ProfileDetailRow(title: 'Địa chỉ', value: user.address ?? ''),
                     ],
                   ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditProfileScreen(
+                          token: widget.token,
+                          userId: widget.userId,
+                          user: user, // Pass user data
+                        ),
+                      ),
+                    );
+                  },
+                  child: Text('Chỉnh sửa thông tin'),
                 ),
               ],
             );
