@@ -1,6 +1,7 @@
-import 'dart:convert';
-
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_doanlt/data/Model/shoe.dart';
+import 'package:flutter_doanlt/page/product_card.dart';
 
 class FavoriteScreen extends StatefulWidget {
   @override
@@ -8,27 +9,29 @@ class FavoriteScreen extends StatefulWidget {
 }
 
 class _FavoriteScreenState extends State<FavoriteScreen> {
-  List<Product> products = [];
+  List<Shoe> favoriteShoes = [];
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadProducts();
+    _loadFavoriteShoes();
   }
 
-  Future<void> _loadProducts() async {
+  Future<void> _loadFavoriteShoes() async {
     try {
-      String data = await DefaultAssetBundle.of(context)
-          .loadString('assets/file/shoe_data.json');
-      final jsonResult = json.decode(data);
-      print('Data loaded: $jsonResult');
+      var response = await Dio().get('http://172.168.1.113:3000/api/favorites'); // Thay bằng URL API của bạn
+      List<dynamic> data = response.data;
+      print('Data loaded: $data');
       setState(() {
-        products = (jsonResult['shoes'] as List)
-            .map((e) => Product.fromJson(e))
-            .toList();
+        favoriteShoes = data.map((json) => Shoe.fromJson(json)).toList();
+        isLoading = false;
       });
     } catch (e) {
-      print('Error loading JSON: $e');
+      print('Error loading favorite shoes: $e');
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -91,145 +94,24 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Expanded(
-                child: products.isNotEmpty
-                    ? GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: 0.8,
-                        ),
-                        itemCount: products.length,
-                        itemBuilder: (context, index) {
-                          return ProductCard(product: products[index]);
-                        },
-                      )
-                    : Center(child: CircularProgressIndicator()),
-              ),
-            ],
-          ),
+          child: isLoading
+              ? Center(child: CircularProgressIndicator())
+              : favoriteShoes.isNotEmpty
+                  ? GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: 0.8,
+                      ),
+                      itemCount: favoriteShoes.length,
+                      itemBuilder: (context, index) {
+                        return ProductCard(shoe: favoriteShoes[index]);
+                      },
+                    )
+                  : Center(child: Text('No favorite shoes found')),
         ),
       ),
-    );
-  }
-}
-
-class ProductCard extends StatelessWidget {
-  final Product product;
-
-  ProductCard({required this.product});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20.0),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(top: 10),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(10.0),
-                    topRight: Radius.circular(10.0),
-                  ),
-                  child: Image.network(
-                    product.imageUrl,
-                    height: 120,
-                    width: double.infinity,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 12.0,
-                top: 12.0,
-                child: Icon(Icons.favorite, color: Colors.red),
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  product.label,
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 8.0),
-                Text(
-                  product.name,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 8.0),
-                Text(
-                  product.price,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 8.0),
-                Row(
-                  children: product.colors
-                      .map((color) => Container(
-                            margin: EdgeInsets.only(left: 4),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: color,
-                            ),
-                            width: 12,
-                            height: 12,
-                          ))
-                      .toList(),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class Product {
-  final String label;
-  final String name;
-  final String price;
-  final String imageUrl;
-  final List<Color> colors;
-
-  Product({
-    required this.label,
-    required this.name,
-    required this.price,
-    required this.imageUrl,
-    required this.colors,
-  });
-
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(
-      label: json['label'],
-      name: json['title'],
-      price: '${json['price']}đ',
-      imageUrl: json['image'],
-      colors: [Colors.teal, Colors.blue, Colors.amber], // Customize as needed
     );
   }
 }

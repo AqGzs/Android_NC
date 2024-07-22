@@ -5,6 +5,10 @@ import 'package:flutter_doanlt/page/filter.dart';
 import 'package:flutter_doanlt/page/product_card.dart';
 import 'package:flutter_doanlt/page/search.dart';
 class ProductListScreen extends StatefulWidget {
+    final String token; 
+
+    ProductListScreen({required this.token});
+
   @override
   _ProductListScreenState createState() => _ProductListScreenState();
 }
@@ -95,7 +99,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SearchScreen()),
+                  MaterialPageRoute(builder: (context) => SearchScreen(token: widget.token)),
                 );
               },
               splashColor: Color(0xFF6699CC),
