@@ -1,13 +1,10 @@
-import 'package:dio/dio.dart'; // Add Dio package for HTTP requests
+import 'package:carousel_slider/carousel_slider.dart'; // Import CarouselSlider package
 import 'package:flutter/material.dart';
 import 'package:flutter_doanlt/data/Model/shoe.dart'; // Import Shoe model
-import 'package:flutter_doanlt/detail/productDetailScreen.dart';
-import 'package:flutter_doanlt/favorite/favorite.dart';
-import 'package:flutter_doanlt/notification/notification.dart';
-import 'package:flutter_doanlt/page/account_setting_screen.dart';
-import 'package:flutter_doanlt/page/cart_screen.dart';
+import 'package:flutter_doanlt/page/product_card1.dart';
 import 'package:flutter_doanlt/page/product_list_screen.dart';
-import 'package:flutter_doanlt/page/search.dart';
+
+import '../data/ApiService.dart';
 
 class HomePage extends StatefulWidget {
   final String token;
@@ -20,159 +17,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _currentIndex = 0;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-    if (index == 4) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => AccountSettingScreen(token: widget.token, userId: widget.userId)),
-      );
-    }
-  }
-
-  final List<Widget> _screens = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _screens.addAll([
-      HomePageContent(token: widget.token, userId: widget.userId),
-      FavoriteScreen(),
-      CartScreen(),
-      NotificationScreen(),
-      AccountSettingScreen(token: widget.token, userId: widget.userId),
-    ]);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_border),
-            label: 'Favorites',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_bag_outlined),
-            label: 'Cart',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications_active_outlined),
-            label: 'Notifications',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_2_outlined),
-            label: 'Profile',
-          ),
-        ],
-        currentIndex: _currentIndex,
-        selectedItemColor: Colors.brown,
-        unselectedItemColor: Colors.grey,
-        showUnselectedLabels: true,
-        onTap: _onItemTapped,
-      ),
-    );
-  }
-}
-
-class HomePageContent extends StatelessWidget {
-  final String token;
-  final String userId;
-
-  HomePageContent({required this.token, required this.userId});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xFF6699CC),
-      appBar: AppBar(
-        backgroundColor: Color(0xFF6699CC),
-        leading: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
-          child: InkWell(
-            onTap: () {},
-            splashColor: Color(0xFF6699CC),
-            hoverColor: Color(0xFF6699CC),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              padding: const EdgeInsets.all(8.0),
-              child: Icon(Icons.grid_view_rounded, size: 20),
-            ),
-          ),
-        ),
-        title: Padding(
-          padding: const EdgeInsets.only(top: 20),
-          child: Center(
-            child: Text(
-              'F5Store',
-              style: TextStyle(
-                fontSize: 20.0,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 16, 16, 0),
-            child: InkWell(
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => CartScreen()));
-              },
-              splashColor: Color(0xFF6699CC),
-              hoverColor: Color(0xFF6699CC),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                padding: const EdgeInsets.all(8.0),
-                child: Icon(Icons.shopping_bag_rounded, size: 20),
-              ),
-            ),
-          ),
-        ],
-      ),
-      body: HomePageBody(token: token, userId: userId),
-    );
-  }
-}
-
-class HomePageBody extends StatefulWidget {
-  final String token;
-  final String userId;
-
-  HomePageBody({required this.token, required this.userId});
-
-  @override
-  _HomePageBodyState createState() => _HomePageBodyState();
-}
-
-class _HomePageBodyState extends State<HomePageBody> {
   String selectedCategory = '';
-  List<Shoe> products = [];
+  List<Shoe> shoes = [];
   bool isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadProducts();
-  }
 
   void selectCategory(String category) {
     setState(() {
@@ -180,13 +27,18 @@ class _HomePageBodyState extends State<HomePageBody> {
     });
   }
 
+  @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
+
   Future<void> _loadProducts() async {
+    ApiService apiService = ApiService();
     try {
-      var response = await Dio().get('http://192.168.1.181:3000/api/shoes'); // Replace with your API URL
-      List<dynamic> data = response.data;
-      List<Shoe> loadedProducts = data.map((json) => Shoe.fromJson(json)).toList();
+      List<Shoe> fetchedShoes = await apiService.getShoes();
       setState(() {
-        products = loadedProducts;
+        shoes = fetchedShoes;
         isLoading = false;
       });
     } catch (e) {
@@ -197,259 +49,210 @@ class _HomePageBodyState extends State<HomePageBody> {
     }
   }
 
-  void _navigateToDetailScreen(Shoe shoe) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => ProductDetailScreen(shoe: shoe)),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 16.0),
-      child: products.isNotEmpty
-          ? CustomScrollView(
-              slivers: [
-                SliverAppBar(
-                  pinned: true,
-                  backgroundColor: Color(0xFF6699CC),
-                  automaticallyImplyLeading: false,
-                  title: TextField(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => SearchScreen()),
-                      );
-                    },
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.search),
-                      hintText: 'Tìm kiếm',
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(35.0),
-                        borderSide: BorderSide.none,
+    return Scaffold(
+      backgroundColor: Color(0xFF6699CC),
+      appBar: AppBar(
+        backgroundColor: Color(0xFF6699CC),
+        elevation: 0,
+        leading: Icon(Icons.menu),
+        title: Center(
+          child: Text(
+            'F5Store',
+            style: TextStyle(
+              fontSize: 20.0,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(right: 16.0),
+            child: IconButton(
+              icon: Icon(Icons.shopping_cart),
+              onPressed: () {},
+            ),
+          ),
+        ],
+      ),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            pinned: true,
+            expandedHeight: 300.0, // Adjust this height as needed
+            backgroundColor: Color(0xFF6699CC),
+            flexibleSpace: FlexibleSpaceBar(
+              background: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    child: TextField(
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.search),
+                        hintText: 'Tìm kiếm',
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(35.0),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: 20.0),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              CategoryButton(
-                                iconPath: 'assets/images/logo_nike.png',
-                                label: 'Nike',
-                                isSelected: selectedCategory == 'Nike',
-                                onTap: () => selectCategory('Nike'),
+                  SizedBox(height: 8.0), // Add some space between the search bar and the carousel
+                  Expanded(
+                    child: CarouselSlider(
+                      options: CarouselOptions(
+                        autoPlay: true,
+                        enlargeCenterPage: true,
+                        viewportFraction: 1.0, // Use full width
+                        aspectRatio: 16 / 9,
+                      ),
+                      items: [
+                        'assets/images/carousel1.jpg',
+                        'assets/images/carousel2.jpg',
+                        'assets/images/carousel3.jpg',
+                      ].map((imagePath) {
+                        return Builder(
+                          builder: (BuildContext context) {
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: Image.asset(
+                                imagePath,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: 220.0,
                               ),
-                              SizedBox(width: 25.0),
-                              CategoryButton(
-                                iconPath: 'assets/images/logo_puma.png',
-                                label: 'Puma',
-                                isSelected: selectedCategory == 'Puma',
-                                onTap: () => selectCategory('Puma'),
-                              ),
-                              SizedBox(width: 25.0),
-                              CategoryButton(
-                                iconPath: 'assets/images/logo_underarmour.png',
-                                label: 'Underarmour',
-                                isSelected: selectedCategory == 'Under Armour',
-                                onTap: () => selectCategory('Under Armour'),
-                              ),
-                              SizedBox(width: 25.0),
-                              CategoryButton(
-                                iconPath: 'assets/images/logo_adidas.png',
-                                label: 'Adidas',
-                                isSelected: selectedCategory == 'Adidas',
-                                onTap: () => selectCategory('Adidas'),
-                              ),
-                              SizedBox(width: 25.0),
-                              CategoryButton(
-                                iconPath: 'assets/images/logo_converse.png',
-                                label: 'Converse',
-                                isSelected: selectedCategory == 'Converse',
-                                onTap: () => selectCategory('Converse'),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 16.0),
-                        SectionTitle(
-                          title: 'Nổi Bật',
-                          onViewAll: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ProductListScreen()),
                             );
                           },
-                        ),
-                        SizedBox(height: 10.0),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: products.map((shoe) {
-                              return GestureDetector(
-                                onTap: () => _navigateToDetailScreen(shoe),
-                                child: ProductCard(
-                                  imagePath: shoe.imageUrl,
-                                  name: shoe.name,
-                                  price: '${shoe.price}đ',
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                        SizedBox(height: 16.0),
-                        SectionTitle(
-                          title: 'Sản Phẩm Mới',
-                          onViewAll: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ProductListScreen()),
-                            );
-                          },
-                        ),
-                        SizedBox(height: 10.0),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: products.map((shoe) {
-                              return GestureDetector(
-                                onTap: () => _navigateToDetailScreen(shoe),
-                                child: ProductCard1(
-                                  imagePath: shoe.imageUrl,
-                                  name: shoe.name,
-                                  price: '${shoe.price}đ',
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ],
+                        );
+                      }).toList(),
                     ),
                   ),
-                ),
-              ],
-            )
-          : Center(child: CircularProgressIndicator()),
+                ],
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 24.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      CategoryButton(
+                        iconPath: 'assets/images/logo_nike.png',
+                        isSelected: selectedCategory == 'Nike',
+                        onTap: () => selectCategory('Nike'),
+                      ),
+                      CategoryButton(
+                        iconPath: 'assets/images/logo_puma.png',
+                        isSelected: selectedCategory == 'Puma',
+                        onTap: () => selectCategory('Puma'),
+                      ),
+                      CategoryButton(
+                        iconPath: 'assets/images/logo_underarmour.png',
+                        isSelected: selectedCategory == 'Under Armour',
+                        onTap: () => selectCategory('Under Armour'),
+                      ),
+                      CategoryButton(
+                        iconPath: 'assets/images/logo_adidas.png',
+                        isSelected: selectedCategory == 'Adidas',
+                        onTap: () => selectCategory('Adidas'),
+                      ),
+                      CategoryButton(
+                        iconPath: 'assets/images/logo_converse.png',
+                        isSelected: selectedCategory == 'Converse',
+                        onTap: () => selectCategory('Converse'),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16.0),
+                  SectionTitle(
+                    title: 'Nổi Bật',
+                    token: widget.token,
+                    onViewAll: () {},
+                  ),
+                  SizedBox(height: 10.0),
+                  Container(
+                    color: Color(0xFF6699CC),
+                    child: isLoading
+                        ? Center(child: CircularProgressIndicator())
+                        : shoes.isNotEmpty
+                            ? SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: shoes.map((shoe) => ProductCard1(shoe: shoe)).toList(),
+                                ),
+                              )
+                            : Center(child: Text('Không tìm thấy sản phẩm')),
+                  ),
+                  SizedBox(height: 16.0),
+                  SectionTitle(
+                    title: 'Sản Phẩm Mới',
+                    token: widget.token,
+                    onViewAll: () {},
+                  ),
+                  SizedBox(height: 10.0),
+                  Container(
+                    color: Color(0xFF6699CC),
+                    child: isLoading
+                        ? Center(child: CircularProgressIndicator())
+                        : shoes.isNotEmpty
+                            ? SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: shoes.map((shoe) => ProductCard1(shoe: shoe)).toList(),
+                                ),
+                              )
+                            : Center(child: Text('Không tìm thấy sản phẩm')),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
-class CategoryButton extends StatefulWidget {
+
+class CategoryButton extends StatelessWidget {
   final String iconPath;
-  final String label;
   final bool isSelected;
   final VoidCallback onTap;
 
   CategoryButton({
     required this.iconPath,
-    required this.label,
     required this.isSelected,
     required this.onTap,
   });
 
   @override
-  _CategoryButtonState createState() => _CategoryButtonState();
-}
-
-class _CategoryButtonState extends State<CategoryButton>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<Offset> _offsetAnimation;
-  late Animation<double> _opacityAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 500),
-      vsync: this,
-    );
-    _offsetAnimation = Tween<Offset>(
-      begin: Offset(0.0, 0.0),
-      end: Offset(0.0, 0.0),
-    ).animate(_controller);
-    _opacityAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(_controller);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        widget.onTap();
-        if (widget.isSelected) {
-          _controller.reverse();
-        } else {
-          _controller.forward();
-        }
-      },
+      onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
-          color: widget.isSelected ? Color(0xFFFEB941) : Colors.transparent,
+          color: isSelected ? Color(0xFFFEB941) : Color(0xFFFFE279),
           borderRadius: BorderRadius.circular(35.0),
+          border: Border.all(
+            color: isSelected ? Color(0xFFFEB941) : Color(0xFF6699CC),
+            width: 3.0,
+          ),
         ),
-        child: widget.isSelected
-            ? Row(
-                children: [
-                  Container(
-                    width: 50.0,
-                    height: 50.0,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Color(0xFFFFE279),
-                    ),
-                    child: Center(
-                      child: Image.asset(widget.iconPath,
-                          width: 35.0, height: 35.0),
-                    ),
-                  ),
-                  SizedBox(width: 8.0),
-                  FadeTransition(
-                    opacity: _opacityAnimation,
-                    child: Text(
-                      widget.label,
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              )
-            : Container(
-                width: 60.0,
-                height: 60.0,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(0xFFFFE279),
-                ),
-                child: Center(
-                  child:
-                      Image.asset(widget.iconPath, width: 40.0, height: 40.0),
-                ),
-              ),
+        child: Column(
+          children: [
+            Image.asset(iconPath, width: 40.0, height: 40.0),
+          ],
+        ),
       ),
     );
   }
@@ -457,9 +260,10 @@ class _CategoryButtonState extends State<CategoryButton>
 
 class SectionTitle extends StatelessWidget {
   final String title;
+  final String token;
   final VoidCallback onViewAll;
 
-  SectionTitle({required this.title, required this.onViewAll});
+  SectionTitle({required this.title, required this.token, required this.onViewAll});
 
   @override
   Widget build(BuildContext context) {
@@ -474,11 +278,41 @@ class SectionTitle extends StatelessWidget {
             color: Colors.black,
           ),
         ),
-        TextButton(
-          onPressed: onViewAll,
+       TextButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProductListScreen(token: token)),
+            );
+          },
           child: Text('Xem thêm', style: TextStyle(color: Colors.black54)),
         ),
       ],
+    );
+  }
+}
+
+class FavoriteButton extends StatefulWidget {
+  @override
+  _FavoriteButtonState createState() => _FavoriteButtonState();
+}
+
+class _FavoriteButtonState extends State<FavoriteButton> {
+  bool _isFavorite = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _isFavorite = !_isFavorite;
+        });
+      },
+      child: Icon(
+        _isFavorite ? Icons.favorite : Icons.favorite_border,
+        size: 30.0,
+        color: _isFavorite ? Colors.red : Colors.black,
+      ),
     );
   }
 }
@@ -510,11 +344,11 @@ class ProductCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(top: 20.0),
+                    padding: EdgeInsets.only(top: 30.0),
                     child: ClipRRect(
                       borderRadius:
                           BorderRadius.vertical(top: Radius.circular(20.0)),
-                      child: Image.network(
+                      child: Image.asset(
                         imagePath,
                         fit: BoxFit.cover,
                         width: double.infinity,
@@ -569,14 +403,14 @@ class ProductCard extends StatelessWidget {
                   },
                   splashColor: Colors.white,
                   child: Container(
-                    width: 45.0,
-                    height: 45.0,
+                    width: 50.0, // adjust the width
+                    height: 50.0,
                     decoration: BoxDecoration(
                       color: Colors.black,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(20.0),
                         bottomRight: Radius.circular(20.0),
-                      ),
+                      ), // adjust the radius to your liking
                     ),
                     child: Icon(
                       Icons.add,
@@ -588,130 +422,6 @@ class ProductCard extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class ProductCard1 extends StatelessWidget {
-  final String imagePath;
-  final String name;
-  final String price;
-
-  ProductCard1({
-    required this.imagePath,
-    required this.name,
-    required this.price,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Container(
-        width: 350,
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
-          ),
-          child: Row(
-            children: [
-              SizedBox(
-                width: 180,
-                child: Expanded(
-                  flex: 1,
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 10.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(top: 10.0),
-                          child: Row(
-                            children: [
-                              Text(
-                                'ĐƯỢC ƯA CHUỘNG',
-                                style: TextStyle(
-                                  color: Color(0xFF5B9EE1),
-                                  fontSize: 14.0,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 12.0),
-                        Text(
-                          name,
-                          style: TextStyle(
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 12.0),
-                        Text(
-                          price,
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            color: const Color.fromARGB(255, 0, 0, 0),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Padding(
-                  padding: EdgeInsets.only(right: 10.0),
-                  child: Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(20.0),
-                        child: Image.network(
-                          imagePath,
-                          fit: BoxFit.contain,
-                          height: 130.0,
-                          width: 170.0,
-                        ),
-                      ),
-                      Positioned(
-                        top: 20.0,
-                        left: 10.0,
-                        child: FavoriteButton(),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class FavoriteButton extends StatefulWidget {
-  @override
-  _FavoriteButtonState createState() => _FavoriteButtonState();
-}
-
-class _FavoriteButtonState extends State<FavoriteButton> {
-  bool _isFavorite = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        setState(() {
-          _isFavorite = !_isFavorite;
-        });
-      },
-      child: Icon(
-        _isFavorite ? Icons.favorite : Icons.favorite_border,
-        size: 30.0,
-        color: _isFavorite ? Colors.red : Colors.black,
       ),
     );
   }

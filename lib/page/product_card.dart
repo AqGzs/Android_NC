@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_doanlt/data/Model/shoe.dart';
 import 'package:flutter_doanlt/detail/productDetailScreen.dart';
@@ -44,7 +45,7 @@ class ProductCard extends StatelessWidget {
                 Positioned(
                   right: 12.0,
                   top: 12.0,
-                  child: FavoriteButton(),
+                  child: FavoriteButton(shoe: shoe),
                 ),
               ],
             ),
@@ -72,7 +73,7 @@ class ProductCard extends StatelessWidget {
                     ),
                     SizedBox(height: 4.0),
                     Text(
-                      shoe.isOutOfStock ? 'Hết hàng' : 'Còn hàng',
+                      shoe.stocks == 0 ? 'Hết hàng' : 'Còn hàng',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey,
@@ -136,6 +137,10 @@ class ProductCard extends StatelessWidget {
 }
 
 class FavoriteButton extends StatefulWidget {
+  final Shoe shoe;
+
+  FavoriteButton({required this.shoe});
+
   @override
   _FavoriteButtonState createState() => _FavoriteButtonState();
 }
@@ -149,6 +154,11 @@ class _FavoriteButtonState extends State<FavoriteButton> {
       onTap: () {
         setState(() {
           _isFavorite = !_isFavorite;
+          if (_isFavorite) {
+            _addToFavorites(widget.shoe.id);
+          } else {
+            _removeFromFavorites(widget.shoe.id);
+          }
         });
       },
       child: Icon(
@@ -157,5 +167,25 @@ class _FavoriteButtonState extends State<FavoriteButton> {
         color: _isFavorite ? Colors.red : Colors.black,
       ),
     );
+  }
+
+  Future<void> _addToFavorites(String shoeId) async {
+    try {
+      var response = await Dio().post('http://172.168.1.113:3000/api/favorites',
+        data: {'shoeId': shoeId},
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+      print('Added to favorites: ${response.data}');
+    } catch (e) {
+      print('Error adding to favorites: $e');
+    }
+  }
+
+  Future<void> _removeFromFavorites(String shoeId) async {
+    // Implement remove from favorites logic if needed
   }
 }
