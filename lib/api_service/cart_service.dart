@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_doanlt/api_service/dio_config.dart';
 import 'package:flutter_doanlt/models/cart.dart';
+import 'package:flutter_doanlt/models/cart_item.dart';
 
 class CartService {
   final Dio _dio = DioConfig.instance;
@@ -42,48 +43,58 @@ class CartService {
       }
     }
   }
+   
+  Future<List<Map<String, dynamic>>> getCartItems(String userId, String token) async {
+    final response = await _dio.get(
+      '/carts/$userId',
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      ),
+    );
 
-  Future<List<Map<String, dynamic>>> getCart(String userId, String token) async {
-    try {
-      final response = await _dio.get(
-        '/carts/$userId',
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-          },
-        ),
-      );
-      return List<Map<String, dynamic>>.from(response.data['items']);
-    } catch (e) {
-      if (e is DioError) {
-        print('Dio error: ${e.response?.data}');
-      } else {
-        print('Error: $e');
-      }
-      return [];
+    if (response.statusCode == 200) {
+      List<Map<String, dynamic>> cartItems = (response.data['items'] as List).map((item) {
+        final product = item['productId'];
+        final stock = item['stock'];
+        return {
+          'productId': product['_id'],
+          'quantity': item['quantity'],
+          'stock': stock['_id'],
+          'title': product['name'],
+          'image': product['imageUrl'],
+          'price': product['price'],
+          'size': stock['size'],
+        };
+      }).toList();
+      return cartItems;
+    } else {
+      throw Exception('Failed to load cart items');
     }
   }
 
-  Future<Cart> updateCart(String cartId, Map<String, dynamic> cartData, String token) async {
+
+   Future<void> updateCartItemQuantity(String cartItemId, int quantity, String token) async {
     try {
       final response = await _dio.put(
-        '/carts/$cartId',
-        data: cartData,
+        'carts/item/$cartItemId',
+        data: {'quantity': quantity},
         options: Options(
           headers: {
             'Authorization': 'Bearer $token',
           },
         ),
       );
-      return Cart.fromJson(response.data);
-    } catch (e) {
-      if (e is DioError) {
-        return Future.error(e.response?.data ?? 'An error occurred');
-      } else {
-        return Future.error('An unexpected error occurred');
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to update cart item quantity');
       }
+    } catch (e) {
+      throw Exception('Error updating cart item quantity: $e');
     }
   }
+
 
   Future<void> deleteCart(String cartId, String token) async {
     try {

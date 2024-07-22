@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_doanlt/page/cart_item.dart';
+import 'cart_item.dart'; // Import the CartItem widget
 
 class CartScreen extends StatefulWidget {
   final List<Map<String, dynamic>> cartItems;
@@ -48,9 +48,9 @@ class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     final int totalAmount = cartItems.fold(
-        0,
-        (sum, item) =>
-            sum + ((item['price'] ?? 0) as int) * ((item['quantity'] ?? 0) as int));
+      0,
+      (sum, item) => sum + ((item['price'] ?? 0) as int) * ((item['quantity'] ?? 0) as int),
+    );
 
     return Scaffold(
       appBar: AppBar(
