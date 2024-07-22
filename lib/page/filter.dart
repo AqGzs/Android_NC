@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_doanlt/data/ApiService.dart';
-import 'package:flutter_doanlt/data/Model/shoe.dart';
+
+import 'package:flutter_doanlt/api_service/shoe_service.dart';
+ 
+import 'package:flutter_doanlt/models/shoe.dart';
 import 'package:intl/intl.dart'; 
 class FilterSheet extends StatefulWidget {
   final Function(List<Shoe>) onFilterApplied;
@@ -24,7 +26,7 @@ class _FilterSheetState extends State<FilterSheet> {
   }
 
   void applyFilters() async {
-    ApiService apiService = ApiService();
+    ShoeService apiService = ShoeService();
     List<Shoe> filteredShoes = await apiService.getShoes(
       size: size,
       minPrice: priceRange.start.toInt(),

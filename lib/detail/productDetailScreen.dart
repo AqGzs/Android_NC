@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_doanlt/data/Model/shoe.dart';
+import 'package:flutter_doanlt/models/shoe.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Shoe shoe;
@@ -12,13 +12,13 @@ class ProductDetailScreen extends StatefulWidget {
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   String selectedColor = '';
-  String selectedSize = '';
+  int selectedSize = 0;
 
   @override
   void initState() {
     super.initState();
     selectedColor = widget.shoe.colors.isNotEmpty ? widget.shoe.colors[0] : '';
-    selectedSize = widget.shoe.sizes.isNotEmpty ? widget.shoe.sizes[0].toString() : '';
+    selectedSize = widget.shoe.stocks.isNotEmpty ? widget.shoe.stocks[0].size ??0 : 0;
   }
 
   @override
@@ -168,16 +168,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     SizedBox(height: 8),
                     Wrap(
                       spacing: 8.0,
-                      children: widget.shoe.sizes.map<Widget>((size) {
+                      children: widget.shoe.stocks.map<Widget>((stock) {
                         return GestureDetector(
                           onTap: () {
                             setState(() {
-                              selectedSize = size.toString();  // Chuyển đổi int thành String
+                              selectedSize = stock.size!;
                             });
                           },
                           child: SizeOption(
-                            size.toString(),  // Chuyển đổi int thành String
-                            isSelected: selectedSize == size.toString(),
+                            stock.size.toString(),
+                            isSelected: selectedSize == stock.size,
                           ),
                         );
                       }).toList(),

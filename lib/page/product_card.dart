@@ -1,10 +1,95 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_doanlt/data/Model/shoe.dart';
 import 'package:flutter_doanlt/detail/productDetailScreen.dart';
-class ProductCard extends StatelessWidget {
-  final Shoe shoe;
+import 'package:flutter_doanlt/models/shoe.dart';
+import 'package:flutter_doanlt/models/stock.dart';
 
-  ProductCard({required this.shoe});
+class ProductCard extends StatefulWidget {
+  final Shoe shoe;
+  final Function(Shoe, Stock, int) onAddToCart;
+
+  ProductCard({required this.shoe, required this.onAddToCart});
+
+  @override
+  _ProductCardState createState() => _ProductCardState();
+}
+
+class _ProductCardState extends State<ProductCard> {
+  void _showAddToCartDialog(BuildContext context) {
+    int quantity = 1;
+    int selectedSize = widget.shoe.stocks.isNotEmpty ? widget.shoe.stocks.first.size : 0;
+    Stock selectedStock = widget.shoe.stocks.isNotEmpty ? widget.shoe.stocks.first : Stock(id: '', size: 0, quantity: 0);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Add to Cart'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Text('Size: '),
+                  DropdownButton<int>(
+                    value: selectedSize,
+                    items: widget.shoe.stocks.map((stock) {
+                      return DropdownMenuItem<int>(
+                        value: stock.size,
+                        child: Text(stock.size.toString()),
+                        onTap: () {
+                          setState(() {
+                            selectedStock = stock;
+                          });
+                        },
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedSize = value!;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Text('Quantity: '),
+                  Expanded(
+                    child: TextField(
+                      keyboardType: TextInputType.number,
+                      onChanged: (value) {
+                        setState(() {
+                          quantity = int.tryParse(value) ?? 1;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Enter quantity',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                widget.onAddToCart(widget.shoe, selectedStock, quantity);
+              },
+              child: Text('Add'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +98,8 @@ class ProductCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => ProductDetailScreen(shoe: shoe)),
+            builder: (context) => ProductDetailScreen(shoe: widget.shoe),
+          ),
         );
       },
       child: Container(
@@ -34,7 +120,7 @@ class ProductCard extends StatelessWidget {
                       topRight: Radius.circular(10.0),
                     ),
                     child: Image.network(
-                      shoe.imageUrl,
+                      widget.shoe.imageUrl,
                       height: 100,
                       width: double.infinity,
                       fit: BoxFit.contain,
@@ -55,7 +141,7 @@ class ProductCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      shoe.brand,
+                      widget.shoe.brand,
                       style: TextStyle(
                         color: Colors.blue,
                         fontSize: 12,
@@ -64,7 +150,7 @@ class ProductCard extends StatelessWidget {
                     ),
                     SizedBox(height: 4.0),
                     Text(
-                      shoe.name,
+                      widget.shoe.name,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -72,7 +158,7 @@ class ProductCard extends StatelessWidget {
                     ),
                     SizedBox(height: 4.0),
                     Text(
-                      shoe.isOutOfStock ? 'Hết hàng' : 'Còn hàng',
+                      widget.shoe.isOutOfStock ? 'Hết hàng' : 'Còn hàng',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey,
@@ -80,7 +166,7 @@ class ProductCard extends StatelessWidget {
                     ),
                     SizedBox(height: 4.0),
                     Text(
-                      '${shoe.price}đ',
+                      '${widget.shoe.price}đ',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -90,7 +176,7 @@ class ProductCard extends StatelessWidget {
                     Wrap(
                       spacing: 4.0,
                       runSpacing: 4.0,
-                      children: shoe.colors.map<Widget>((color) {
+                      children: widget.shoe.colors.map<Widget>((color) {
                         return Container(
                           width: 8,
                           height: 8,
@@ -102,6 +188,19 @@ class ProductCard extends StatelessWidget {
                       }).toList(),
                     ),
                   ],
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 8.0, bottom: 8.0),
+                child: IconButton(
+                  icon: Icon(Icons.add_shopping_cart),
+                  color: Colors.blue,
+                  onPressed: () {
+                    _showAddToCartDialog(context);
+                  },
                 ),
               ),
             ),

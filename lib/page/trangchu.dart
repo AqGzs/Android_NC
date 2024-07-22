@@ -1,8 +1,7 @@
 import 'package:dio/dio.dart'; // Add Dio package for HTTP requests
 import 'package:flutter/material.dart';
-import 'package:flutter_doanlt/data/Model/shoe.dart'; // Import Shoe model
-import 'package:flutter_doanlt/detail/productDetailScreen.dart';
 import 'package:flutter_doanlt/favorite/favorite.dart';
+import 'package:flutter_doanlt/models/shoe.dart';
 import 'package:flutter_doanlt/notification/notification.dart';
 import 'package:flutter_doanlt/page/account_setting_screen.dart';
 import 'package:flutter_doanlt/page/cart_screen.dart';
@@ -42,7 +41,7 @@ class _HomePageState extends State<HomePage> {
     _screens.addAll([
       HomePageContent(token: widget.token, userId: widget.userId),
       FavoriteScreen(),
-      CartScreen(),
+      // CartScreen(),
       NotificationScreen(),
       AccountSettingScreen(token: widget.token, userId: widget.userId),
     ]);
@@ -131,8 +130,8 @@ class HomePageContent extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(0, 16, 16, 0),
             child: InkWell(
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => CartScreen()));
+                // Navigator.push(context,
+                //     MaterialPageRoute(builder: (context) => CartScreen()));
               },
               splashColor: Color(0xFF6699CC),
               hoverColor: Color(0xFF6699CC),
@@ -198,11 +197,11 @@ class _HomePageBodyState extends State<HomePageBody> {
   }
 
   void _navigateToDetailScreen(Shoe shoe) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => ProductDetailScreen(shoe: shoe)),
-    );
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //       builder: (context) => ProductDetailScreen(shoe: shoe)),
+    // );
   }
 
   @override
@@ -291,7 +290,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => ProductListScreen()),
+                                  builder: (context) => ProductListScreen(token: widget.token, userId: widget.userId,)),
                             );
                           },
                         ),
@@ -303,7 +302,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                               return GestureDetector(
                                 onTap: () => _navigateToDetailScreen(shoe),
                                 child: ProductCard(
-                                  imagePath: shoe.imageUrl,
+                                  imagePath: shoe.imageUrl!,
                                   name: shoe.name,
                                   price: '${shoe.price}đ',
                                 ),
@@ -318,7 +317,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => ProductListScreen()),
+                                  builder: (context) => ProductListScreen(token: widget.token,userId: widget.userId,)),
                             );
                           },
                         ),
@@ -329,11 +328,11 @@ class _HomePageBodyState extends State<HomePageBody> {
                             children: products.map((shoe) {
                               return GestureDetector(
                                 onTap: () => _navigateToDetailScreen(shoe),
-                                child: ProductCard1(
-                                  imagePath: shoe.imageUrl,
-                                  name: shoe.name,
-                                  price: '${shoe.price}đ',
-                                ),
+                                // child: ProductCard1(
+                                //   imagePath: shoe.imageUrl!,
+                                //   name: shoe.name,
+                                //   price: '${shoe.price}đ',
+                                // ),
                               );
                             }).toList(),
                           ),
@@ -593,104 +592,6 @@ class ProductCard extends StatelessWidget {
   }
 }
 
-class ProductCard1 extends StatelessWidget {
-  final String imagePath;
-  final String name;
-  final String price;
-
-  ProductCard1({
-    required this.imagePath,
-    required this.name,
-    required this.price,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Container(
-        width: 350,
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
-          ),
-          child: Row(
-            children: [
-              SizedBox(
-                width: 180,
-                child: Expanded(
-                  flex: 1,
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 10.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(top: 10.0),
-                          child: Row(
-                            children: [
-                              Text(
-                                'ĐƯỢC ƯA CHUỘNG',
-                                style: TextStyle(
-                                  color: Color(0xFF5B9EE1),
-                                  fontSize: 14.0,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 12.0),
-                        Text(
-                          name,
-                          style: TextStyle(
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 12.0),
-                        Text(
-                          price,
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            color: const Color.fromARGB(255, 0, 0, 0),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Padding(
-                  padding: EdgeInsets.only(right: 10.0),
-                  child: Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(20.0),
-                        child: Image.network(
-                          imagePath,
-                          fit: BoxFit.contain,
-                          height: 130.0,
-                          width: 170.0,
-                        ),
-                      ),
-                      Positioned(
-                        top: 20.0,
-                        left: 10.0,
-                        child: FavoriteButton(),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class FavoriteButton extends StatefulWidget {
   @override

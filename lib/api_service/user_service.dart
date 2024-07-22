@@ -1,16 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_doanlt/models/user.dart';
+import 'package:flutter_doanlt/api_service/dio_config.dart';
+
 
 class UserService {
-  final Dio _dio = Dio(BaseOptions(
-    baseUrl: 'http://192.168.1.125:3000/api', // Địa chỉ IP của máy tính của bạn
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-  
-  ));
-  
+   final Dio _dio = DioConfig.instance;
 
   Future<User> getUserDetails(String userId, String token) async {
     try {

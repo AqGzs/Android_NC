@@ -1,20 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_doanlt/models/user.dart';
+import 'package:flutter_doanlt/api_service/dio_config.dart';
 
 class AuthService {
-  final Dio _dio = Dio(BaseOptions(
-    baseUrl: 'http://192.168.1.125:3000/api', // Địa chỉ IP của máy tính của bạn
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-  // 5 seconds
-  ))..interceptors.add(LogInterceptor(
-      request: true,
-      requestBody: true,
-      responseBody: true,
-      error: true,
-    ));
+  final Dio _dio = DioConfig.instance;
   
  Future<Map<String, dynamic>> login(String email, String password) async {
     try {
