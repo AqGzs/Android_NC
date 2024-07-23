@@ -1,8 +1,14 @@
 import 'package:carousel_slider/carousel_slider.dart'; // Import CarouselSlider package
 import 'package:flutter/material.dart';
+import 'package:flutter_doanlt/favorite/favorite.dart';
+import 'package:flutter_doanlt/models/shoe.dart';
+import 'package:flutter_doanlt/notification/notification.dart';
+import 'package:flutter_doanlt/page/account_setting_screen.dart';
+import 'package:flutter_doanlt/page/cart_screen.dart';
 import 'package:flutter_doanlt/data/Model/shoe.dart'; // Import Shoe model
 import 'package:flutter_doanlt/page/product_card1.dart';
 import 'package:flutter_doanlt/page/product_list_screen.dart';
+import 'package:flutter_doanlt/page/search.dart';
 
 import '../data/ApiService.dart';
 
@@ -30,6 +36,13 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    _screens.addAll([
+      HomePageContent(token: widget.token, userId: widget.userId),
+      FavoriteScreen(),
+      // CartScreen(),
+      NotificationScreen(),
+      AccountSettingScreen(token: widget.token, userId: widget.userId),
+    ]);
     _loadProducts();
   }
 
@@ -69,35 +82,109 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: IconButton(
-              icon: Icon(Icons.shopping_cart),
-              onPressed: () {},
+            padding: const EdgeInsets.fromLTRB(0, 16, 16, 0),
+            child: InkWell(
+              onTap: () {
+                // Navigator.push(context,
+                //     MaterialPageRoute(builder: (context) => CartScreen()));
+              },
+              splashColor: Color(0xFF6699CC),
+              hoverColor: Color(0xFF6699CC),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(Icons.shopping_bag_rounded, size: 20),
+              ),
             ),
           ),
         ],
       ),
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            pinned: true,
-            expandedHeight: 300.0, // Adjust this height as needed
-            backgroundColor: Color(0xFF6699CC),
-            flexibleSpace: FlexibleSpaceBar(
-              background: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.search),
-                        hintText: 'Tìm kiếm',
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(35.0),
-                          borderSide: BorderSide.none,
-                        ),
+      body: HomePageBody(token: widget.token, userId: widget.userId),
+    );
+  }
+}
+
+class HomePageBody extends StatefulWidget {
+  final String token;
+  final String userId;
+
+  HomePageBody({required this.token, required this.userId});
+
+  @override
+  _HomePageBodyState createState() => _HomePageBodyState();
+}
+
+class _HomePageBodyState extends State<HomePageBody> {
+  String selectedCategory = '';
+  List<Shoe> products = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
+
+  void selectCategory(String category) {
+    setState(() {
+      selectedCategory = category;
+    });
+  }
+
+  Future<void> _loadProducts() async {
+    try {
+      var response = await Dio().get('http://192.168.1.181:3000/api/shoes'); // Replace with your API URL
+      List<dynamic> data = response.data;
+      List<Shoe> loadedProducts = data.map((json) => Shoe.fromJson(json)).toList();
+      setState(() {
+        products = loadedProducts;
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error loading products: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void _navigateToDetailScreen(Shoe shoe) {
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //       builder: (context) => ProductDetailScreen(shoe: shoe)),
+    // );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16.0),
+      child: products.isNotEmpty
+          ? CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  pinned: true,
+                  backgroundColor: Color(0xFF6699CC),
+                  automaticallyImplyLeading: false,
+                  title: TextField(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => SearchScreen()),
+                      );
+                    },
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.search),
+                      hintText: 'Tìm kiếm',
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(35.0),
+                        borderSide: BorderSide.none,
                       ),
                     ),
                   ),
@@ -131,93 +218,91 @@ class _HomePageState extends State<HomePage> {
                       }).toList(),
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 24.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      CategoryButton(
-                        iconPath: 'assets/images/logo_nike.png',
-                        isSelected: selectedCategory == 'Nike',
-                        onTap: () => selectCategory('Nike'),
-                      ),
-                      CategoryButton(
-                        iconPath: 'assets/images/logo_puma.png',
-                        isSelected: selectedCategory == 'Puma',
-                        onTap: () => selectCategory('Puma'),
-                      ),
-                      CategoryButton(
-                        iconPath: 'assets/images/logo_underarmour.png',
-                        isSelected: selectedCategory == 'Under Armour',
-                        onTap: () => selectCategory('Under Armour'),
-                      ),
-                      CategoryButton(
-                        iconPath: 'assets/images/logo_adidas.png',
-                        isSelected: selectedCategory == 'Adidas',
-                        onTap: () => selectCategory('Adidas'),
-                      ),
-                      CategoryButton(
-                        iconPath: 'assets/images/logo_converse.png',
-                        isSelected: selectedCategory == 'Converse',
-                        onTap: () => selectCategory('Converse'),
-                      ),
-                    ],
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 24.0),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            CategoryButton(
+                              iconPath: 'assets/images/logo_nike.png',
+                              isSelected: selectedCategory == 'Nike',
+                              onTap: () => selectCategory('Nike'),
+                            ),
+                            CategoryButton(
+                              iconPath: 'assets/images/logo_puma.png',
+                              isSelected: selectedCategory == 'Puma',
+                              onTap: () => selectCategory('Puma'),
+                            ),
+                            CategoryButton(
+                              iconPath: 'assets/images/logo_underarmour.png',
+                              isSelected: selectedCategory == 'Under Armour',
+                              onTap: () => selectCategory('Under Armour'),
+                            ),
+                            CategoryButton(
+                              iconPath: 'assets/images/logo_adidas.png',
+                              isSelected: selectedCategory == 'Adidas',
+                              onTap: () => selectCategory('Adidas'),
+                            ),
+                            CategoryButton(
+                              iconPath: 'assets/images/logo_converse.png',
+                              isSelected: selectedCategory == 'Converse',
+                              onTap: () => selectCategory('Converse'),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 16.0),
+                        SectionTitle(
+                          title: 'Nổi Bật',
+                          token: widget.token,
+                          onViewAll: () {},
+                        ),
+                        SizedBox(height: 10.0),
+                        Container(
+                          color: Color(0xFF6699CC),
+                          child: isLoading
+                              ? Center(child: CircularProgressIndicator())
+                              : shoes.isNotEmpty
+                                  ? SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Row(
+                                        children: shoes.map((shoe) => ProductCard1(shoe: shoe)).toList(),
+                                      ),
+                                    )
+                                  : Center(child: Text('Không tìm thấy sản phẩm')),
+                        ),
+                        SizedBox(height: 16.0),
+                        SectionTitle(
+                          title: 'Sản Phẩm Mới',
+                          token: widget.token,
+                          onViewAll: () {},
+                        ),
+                        SizedBox(height: 10.0),
+                        Container(
+                          color: Color(0xFF6699CC),
+                          child: isLoading
+                              ? Center(child: CircularProgressIndicator())
+                              : shoes.isNotEmpty
+                                  ? SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Row(
+                                        children: shoes.map((shoe) => ProductCard1(shoe: shoe)).toList(),
+                                      ),
+                                    )
+                                  : Center(child: Text('Không tìm thấy sản phẩm')),
+                        ),
+                      ],
+                    ),
                   ),
-                  SizedBox(height: 16.0),
-                  SectionTitle(
-                    title: 'Nổi Bật',
-                    token: widget.token,
-                    onViewAll: () {},
-                  ),
-                  SizedBox(height: 10.0),
-                  Container(
-                    color: Color(0xFF6699CC),
-                    child: isLoading
-                        ? Center(child: CircularProgressIndicator())
-                        : shoes.isNotEmpty
-                            ? SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  children: shoes.map((shoe) => ProductCard1(shoe: shoe)).toList(),
-                                ),
-                              )
-                            : Center(child: Text('Không tìm thấy sản phẩm')),
-                  ),
-                  SizedBox(height: 16.0),
-                  SectionTitle(
-                    title: 'Sản Phẩm Mới',
-                    token: widget.token,
-                    onViewAll: () {},
-                  ),
-                  SizedBox(height: 10.0),
-                  Container(
-                    color: Color(0xFF6699CC),
-                    child: isLoading
-                        ? Center(child: CircularProgressIndicator())
-                        : shoes.isNotEmpty
-                            ? SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  children: shoes.map((shoe) => ProductCard1(shoe: shoe)).toList(),
-                                ),
-                              )
-                            : Center(child: Text('Không tìm thấy sản phẩm')),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+                ),
+              ],
+            )
+          : Center(child: Text('Không tìm thấy sản phẩm')),
     );
   }
 }

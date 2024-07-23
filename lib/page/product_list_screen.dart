@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_doanlt/data/ApiService.dart';
-import 'package:flutter_doanlt/data/Model/shoe.dart';
+import 'package:flutter_doanlt/api_service/cart_service.dart';
+import 'package:flutter_doanlt/api_service/shoe_service.dart';
+import 'package:flutter_doanlt/models/shoe.dart';
+import 'package:flutter_doanlt/models/stock.dart';
+import 'package:flutter_doanlt/page/cart_screen.dart';
 import 'package:flutter_doanlt/page/filter.dart';
 import 'package:flutter_doanlt/page/product_card.dart';
 import 'package:flutter_doanlt/page/search.dart';
-class ProductListScreen extends StatefulWidget {
-    final String token; 
 
-    ProductListScreen({required this.token});
+class ProductListScreen extends StatefulWidget {
+  final String userId;
+  final String token;
+
+  ProductListScreen({required this.userId, required this.token});
 
   @override
   _ProductListScreenState createState() => _ProductListScreenState();
@@ -15,7 +20,9 @@ class ProductListScreen extends StatefulWidget {
 
 class _ProductListScreenState extends State<ProductListScreen> {
   List<Shoe> shoes = [];
+  List<Map<String, dynamic>> cartItems = [];
   bool isLoading = true;
+  int totalItemsInCart = 0;
 
   @override
   void initState() {
@@ -24,7 +31,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
   }
 
   Future<void> _loadProducts() async {
-    ApiService apiService = ApiService();
+    ShoeService apiService = ShoeService();
     try {
       List<Shoe> fetchedShoes = await apiService.getShoes();
       setState(() {
@@ -53,6 +60,34 @@ class _ProductListScreenState extends State<ProductListScreen> {
           });
         });
       },
+    );
+  }
+
+  Future<void> _addToCart(Shoe shoe, Stock stock, int quantity) async {
+    CartService cartService = CartService();
+    await cartService.createCart(widget.userId, shoe.id, stock.id, quantity, widget.token);
+    setState(() {
+      totalItemsInCart += quantity;
+      cartItems.add({
+        'title': shoe.name,
+        'price': shoe.price,
+        'size': stock.size,
+        'quantity': quantity,
+        'image': shoe.imageUrl,
+      });
+      print('Cart items: $cartItems');
+      print('Total items in cart: $totalItemsInCart');
+    });
+  }
+
+  Future<void> _navigateToCartScreen() async {
+    CartService cartService = CartService();
+    List<Map<String, dynamic>> cartItems = await cartService.getCart(widget.userId, widget.token);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CartScreen(cartItems: cartItems),
+      ),
     );
   }
 
@@ -149,12 +184,37 @@ class _ProductListScreenState extends State<ProductListScreen> {
                         childAspectRatio: 0.8,
                       ),
                       itemBuilder: (context, index) {
-                        return ProductCard(shoe: shoes[index]);
+                        return ProductCard(
+                          shoe: shoes[index],
+                          onAddToCart: (shoe, stock, quantity) => _addToCart(shoes[index], stock, quantity),
+                        );
                       },
                     )
                   : Center(child: Text('Không tìm thấy sản phẩm')),
         ),
       ),
+      floatingActionButton: Stack(
+        children: [
+          FloatingActionButton(
+            onPressed: _navigateToCartScreen,
+            child: Icon(Icons.shopping_cart),
+            backgroundColor: Colors.blue,
+          ),
+          if (totalItemsInCart > 0)
+            Positioned(
+              right: 0,
+              child: CircleAvatar(
+                radius: 10,
+                backgroundColor: Colors.red,
+                child: Text(
+                  '$totalItemsInCart',
+                  style: TextStyle(fontSize: 12, color: Colors.white),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
+

@@ -2,8 +2,18 @@ import 'package:flutter/material.dart';
 
 class CartItem extends StatelessWidget {
   final Map<String, dynamic> item;
+  final Function(Map<String, dynamic>) onIncreaseQuantity;
+  final Function(Map<String, dynamic>) onDecreaseQuantity;
+  final Function(Map<String, dynamic>) onRemoveItem;
+  final Function(Map<String, dynamic>, int) onQuantityChanged;
 
-  CartItem({required this.item});
+  CartItem({
+    required this.item,
+    required this.onIncreaseQuantity,
+    required this.onDecreaseQuantity,
+    required this.onRemoveItem,
+    required this.onQuantityChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +28,7 @@ class CartItem extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child: Image.asset(
+            child: Image.network(
               item['image'],
               width: 75,
               height: 75,
@@ -40,7 +50,7 @@ class CartItem extends StatelessWidget {
                   style: TextStyle(fontSize: 18, color: Colors.grey),
                 ),
                 Text(
-                  'Size: ${item['size']}',
+                  'Size: ${(item['size'] as int).toString()}',
                   style: TextStyle(fontSize: 18, color: Colors.grey),
                 ),
               ],
@@ -50,19 +60,19 @@ class CartItem extends StatelessWidget {
             children: [
               IconButton(
                 icon: Icon(Icons.remove_circle_outline),
-                onPressed: () {},
+                onPressed: () => onDecreaseQuantity(item),
               ),
               Text(
-                item['quantity'].toString(),
+                (item['quantity'] as int).toString(),
                 style: TextStyle(fontSize: 18),
               ),
               IconButton(
                 icon: Icon(Icons.add_circle_outline),
-                onPressed: () {},
+                onPressed: () => onIncreaseQuantity(item),
               ),
               IconButton(
                 icon: Icon(Icons.delete_outline, color: Colors.red),
-                onPressed: () {},
+                onPressed: () => onRemoveItem(item),
               ),
             ],
           ),
