@@ -4,7 +4,7 @@ import 'package:flutter_doanlt/data/Model/user.dart';
 
 class ApiService {
   final Dio _dio = Dio(BaseOptions(
-    baseUrl: 'http://192.168.1.181:3000/api', // Địa chỉ IP của máy tính của bạn
+    baseUrl: 'http://192.168.1.68:3000/api', // Địa chỉ IP của máy tính của bạn
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
@@ -79,6 +79,26 @@ class ApiService {
       throw Exception('Failed to update shoe: $error');
     }
   }
+   Future<List<Shoe>> searchShoes(String query, String token) async {
+    try {
+      final response = await _dio.get(
+        '/shoes',
+        queryParameters: {'search': query},
+        options: Options(headers: {
+          'Authorization': 'Bearer $token',
+        }),
+      );
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data;
+        return data.map((json) => Shoe.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to fetch shoes');
+      }
+    } catch (error) {
+      throw Exception('Failed to fetch shoes: $error');
+    }
+  }
+
 
   Future<void> deleteShoe(int id) async {
     try {

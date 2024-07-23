@@ -134,7 +134,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SearchScreen()),
+                  MaterialPageRoute(builder: (context) => SearchScreen(token: widget.token)),
                 );
               },
               splashColor: Color(0xFF6699CC),
@@ -217,3 +217,4 @@ class _ProductListScreenState extends State<ProductListScreen> {
     );
   }
 }
+
