@@ -1,11 +1,10 @@
 import 'package:carousel_slider/carousel_slider.dart'; // Import CarouselSlider package
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_doanlt/data/Model/shoe.dart'; // Import Shoe model
 import 'package:flutter_doanlt/favorite/favorite.dart';
-import 'package:flutter_doanlt/models/shoe.dart';
 import 'package:flutter_doanlt/notification/notification.dart';
 import 'package:flutter_doanlt/page/account_setting_screen.dart';
-import 'package:flutter_doanlt/page/cart_screen.dart';
-import 'package:flutter_doanlt/data/Model/shoe.dart'; // Import Shoe model
 import 'package:flutter_doanlt/page/product_card1.dart';
 import 'package:flutter_doanlt/page/product_list_screen.dart';
 import 'package:flutter_doanlt/page/search.dart';
@@ -26,6 +25,7 @@ class _HomePageState extends State<HomePage> {
   String selectedCategory = '';
   List<Shoe> shoes = [];
   bool isLoading = true;
+  List<Widget> _screens = [];
 
   void selectCategory(String category) {
     setState(() {
@@ -39,7 +39,6 @@ class _HomePageState extends State<HomePage> {
     _screens.addAll([
       HomePageContent(token: widget.token, userId: widget.userId),
       FavoriteScreen(),
-      // CartScreen(),
       NotificationScreen(),
       AccountSettingScreen(token: widget.token, userId: widget.userId),
     ]);
@@ -136,7 +135,7 @@ class _HomePageBodyState extends State<HomePageBody> {
 
   Future<void> _loadProducts() async {
     try {
-      var response = await Dio().get('http://192.168.1.181:3000/api/shoes'); // Replace with your API URL
+      var response = await Dio().get('http://192.168.1.78:3000/api/shoes'); // Replace with your API URL
       List<dynamic> data = response.data;
       List<Shoe> loadedProducts = data.map((json) => Shoe.fromJson(json)).toList();
       setState(() {
@@ -174,7 +173,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => SearchScreen()),
+                        MaterialPageRoute(builder: (context) => SearchScreen(token: widget.token)),
                       );
                     },
                     decoration: InputDecoration(
@@ -188,116 +187,112 @@ class _HomePageBodyState extends State<HomePageBody> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 8.0), // Add some space between the search bar and the carousel
-                  Expanded(
-                    child: CarouselSlider(
-                      options: CarouselOptions(
-                        autoPlay: true,
-                        enlargeCenterPage: true,
-                        viewportFraction: 1.0, // Use full width
-                        aspectRatio: 16 / 9,
-                      ),
-                      items: [
-                        'assets/images/carousel1.jpg',
-                        'assets/images/carousel2.jpg',
-                        'assets/images/carousel3.jpg',
-                      ].map((imagePath) {
-                        return Builder(
-                          builder: (BuildContext context) {
-                            return ClipRRect(
-                              borderRadius: BorderRadius.circular(8.0),
-                              child: Image.asset(
-                                imagePath,
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: 220.0,
-                              ),
-                            );
-                          },
-                        );
-                      }).toList(),
-                    ),
-                  ),
                 ),
                 SliverToBoxAdapter(
-                  child: Padding(
-                    const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: 24.0),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            CategoryButton(
-                              iconPath: 'assets/images/logo_nike.png',
-                              isSelected: selectedCategory == 'Nike',
-                              onTap: () => selectCategory('Nike'),
-                            ),
-                            CategoryButton(
-                              iconPath: 'assets/images/logo_puma.png',
-                              isSelected: selectedCategory == 'Puma',
-                              onTap: () => selectCategory('Puma'),
-                            ),
-                            CategoryButton(
-                              iconPath: 'assets/images/logo_underarmour.png',
-                              isSelected: selectedCategory == 'Under Armour',
-                              onTap: () => selectCategory('Under Armour'),
-                            ),
-                            CategoryButton(
-                              iconPath: 'assets/images/logo_adidas.png',
-                              isSelected: selectedCategory == 'Adidas',
-                              onTap: () => selectCategory('Adidas'),
-                            ),
-                            CategoryButton(
-                              iconPath: 'assets/images/logo_converse.png',
-                              isSelected: selectedCategory == 'Converse',
-                              onTap: () => selectCategory('Converse'),
-                            ),
-                          ],
+                  child: Column(
+                    children: [
+                      SizedBox(height: 8.0), // Add some space between the search bar and the carousel
+                      CarouselSlider(
+                        options: CarouselOptions(
+                          autoPlay: true,
+                          enlargeCenterPage: true,
+                          viewportFraction: 1.0, // Use full width
+                          aspectRatio: 16 / 9,
                         ),
-                        SizedBox(height: 16.0),
-                        SectionTitle(
-                          title: 'Nổi Bật',
-                          token: widget.token,
-                          onViewAll: () {},
-                        ),
-                        SizedBox(height: 10.0),
-                        Container(
-                          color: Color(0xFF6699CC),
-                          child: isLoading
-                              ? Center(child: CircularProgressIndicator())
-                              : shoes.isNotEmpty
-                                  ? SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Row(
-                                        children: shoes.map((shoe) => ProductCard1(shoe: shoe)).toList(),
-                                      ),
-                                    )
-                                  : Center(child: Text('Không tìm thấy sản phẩm')),
-                        ),
-                        SizedBox(height: 16.0),
-                        SectionTitle(
-                          title: 'Sản Phẩm Mới',
-                          token: widget.token,
-                          onViewAll: () {},
-                        ),
-                        SizedBox(height: 10.0),
-                        Container(
-                          color: Color(0xFF6699CC),
-                          child: isLoading
-                              ? Center(child: CircularProgressIndicator())
-                              : shoes.isNotEmpty
-                                  ? SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Row(
-                                        children: shoes.map((shoe) => ProductCard1(shoe: shoe)).toList(),
-                                      ),
-                                    )
-                                  : Center(child: Text('Không tìm thấy sản phẩm')),
-                        ),
-                      ],
-                    ),
+                        items: [
+                          'assets/images/carousel1.jpg',
+                          'assets/images/carousel2.jpg',
+                          'assets/images/carousel3.jpg',
+                        ].map((imagePath) {
+                          return Builder(
+                            builder: (BuildContext context) {
+                              return ClipRRect(
+                                borderRadius: BorderRadius.circular(8.0),
+                                child: Image.asset(
+                                  imagePath,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: 220.0,
+                                ),
+                              );
+                            },
+                          );
+                        }).toList(),
+                      ),
+                      SizedBox(height: 24.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          CategoryButton(
+                            iconPath: 'assets/images/logo_nike.png',
+                            isSelected: selectedCategory == 'Nike',
+                            onTap: () => selectCategory('Nike'),
+                          ),
+                          CategoryButton(
+                            iconPath: 'assets/images/logo_puma.png',
+                            isSelected: selectedCategory == 'Puma',
+                            onTap: () => selectCategory('Puma'),
+                          ),
+                          CategoryButton(
+                            iconPath: 'assets/images/logo_underarmour.png',
+                            isSelected: selectedCategory == 'Under Armour',
+                            onTap: () => selectCategory('Under Armour'),
+                          ),
+                          CategoryButton(
+                            iconPath: 'assets/images/logo_adidas.png',
+                            isSelected: selectedCategory == 'Adidas',
+                            onTap: () => selectCategory('Adidas'),
+                          ),
+                          CategoryButton(
+                            iconPath: 'assets/images/logo_converse.png',
+                            isSelected: selectedCategory == 'Converse',
+                            onTap: () => selectCategory('Converse'),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 16.0),
+                      SectionTitle(
+                        title: 'Nổi Bật',
+                        token: widget.token,
+                         userId: widget.userId,
+                        onViewAll: () {},
+                      ),
+                      SizedBox(height: 10.0),
+                      Container(
+                        color: Color(0xFF6699CC),
+                        child: isLoading
+                            ? Center(child: CircularProgressIndicator())
+                            : products.isNotEmpty
+                                ? SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children: products.map((shoe) => ProductCard1(shoe: shoe)).toList(),
+                                    ),
+                                  )
+                                : Center(child: Text('Không tìm thấy sản phẩm')),
+                      ),
+                      SizedBox(height: 16.0),
+                      SectionTitle(
+                        title: 'Sản Phẩm Mới',
+                        token: widget.token,
+                         userId: widget.userId,
+                        onViewAll: () {},
+                      ),
+                      SizedBox(height: 10.0),
+                      Container(
+                        color: Color(0xFF6699CC),
+                        child: isLoading
+                            ? Center(child: CircularProgressIndicator())
+                            : products.isNotEmpty
+                                ? SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children: products.map((shoe) => ProductCard1(shoe: shoe)).toList(),
+                                    ),
+                                  )
+                                : Center(child: Text('Không tìm thấy sản phẩm')),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -306,7 +301,6 @@ class _HomePageBodyState extends State<HomePageBody> {
     );
   }
 }
-
 
 class CategoryButton extends StatelessWidget {
   final String iconPath;
@@ -345,10 +339,11 @@ class CategoryButton extends StatelessWidget {
 
 class SectionTitle extends StatelessWidget {
   final String title;
+  final String userId;
   final String token;
   final VoidCallback onViewAll;
 
-  SectionTitle({required this.title, required this.token, required this.onViewAll});
+  SectionTitle({required this.title, required this.token, required this.userId,required this.onViewAll});
 
   @override
   Widget build(BuildContext context) {
@@ -363,11 +358,14 @@ class SectionTitle extends StatelessWidget {
             color: Colors.black,
           ),
         ),
-       TextButton(
+        TextButton(
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => ProductListScreen(token: token)),
+              MaterialPageRoute(builder: (context) => ProductListScreen(
+                token: token,
+                userId: userId,
+          )),
             );
           },
           child: Text('Xem thêm', style: TextStyle(color: Colors.black54)),
@@ -431,8 +429,7 @@ class ProductCard extends StatelessWidget {
                   Padding(
                     padding: EdgeInsets.only(top: 30.0),
                     child: ClipRRect(
-                      borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(20.0)),
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
                       child: Image.asset(
                         imagePath,
                         fit: BoxFit.cover,
@@ -509,5 +506,18 @@ class ProductCard extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class HomePageContent extends StatelessWidget {
+  final String token;
+  final String userId;
+
+  HomePageContent({required this.token, required this.userId});
+
+  @override
+  Widget build(BuildContext context) {
+    // Build your HomePage content here
+    return Container();
   }
 }

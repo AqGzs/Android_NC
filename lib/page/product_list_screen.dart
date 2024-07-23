@@ -82,7 +82,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
   Future<void> _navigateToCartScreen() async {
     CartService cartService = CartService();
-    List<Map<String, dynamic>> cartItems = await cartService.getCart(widget.userId, widget.token);
+    List<Map<String, dynamic>> cartItems = await cartService.getCartItems(widget.userId, widget.token);
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -193,7 +193,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   : Center(child: Text('Không tìm thấy sản phẩm')),
         ),
       ),
-      floatingActionButton: Stack(
+       floatingActionButton: Stack(
         children: [
           FloatingActionButton(
             onPressed: _navigateToCartScreen,

@@ -4,7 +4,7 @@ import 'package:flutter_doanlt/data/Model/user.dart';
 
 class ApiService {
   final Dio _dio = Dio(BaseOptions(
-    baseUrl: 'http://192.168.1.68:3000/api', // Địa chỉ IP của máy tính của bạn
+    baseUrl: 'http://192.168.1.78:3000/api', // Địa chỉ IP của máy tính của bạn
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',

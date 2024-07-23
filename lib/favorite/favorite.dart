@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_doanlt/data/Model/shoe.dart';
-import 'package:flutter_doanlt/page/product_card.dart';
+import 'package:flutter_doanlt/data/Model/shoe.dart' as data_model_shoe;
 
 class FavoriteScreen extends StatefulWidget {
   @override
@@ -9,7 +8,7 @@ class FavoriteScreen extends StatefulWidget {
 }
 
 class _FavoriteScreenState extends State<FavoriteScreen> {
-  List<Shoe> favoriteShoes = [];
+  List<data_model_shoe.Shoe> favoriteShoes = [];
   bool isLoading = true;
 
   @override
@@ -20,11 +19,11 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
 
   Future<void> _loadFavoriteShoes() async {
     try {
-      var response = await Dio().get('http://172.168.1.113:3000/api/favorites'); // Thay bằng URL API của bạn
+      var response = await Dio().get('http://172.168.1.113:3000/api/favorites'); // Replace with your API URL
       List<dynamic> data = response.data;
       print('Data loaded: $data');
       setState(() {
-        favoriteShoes = data.map((json) => Shoe.fromJson(json)).toList();
+        favoriteShoes = data.map((json) => data_model_shoe.Shoe.fromJson(json)).toList();
         isLoading = false;
       });
     } catch (e) {
@@ -35,32 +34,37 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
     }
   }
 
+  void _addToCart(data_model_shoe.Shoe shoe) {
+    // Implement add to cart functionality here
+    print('Added to cart: ${shoe.name}');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF6699CC),
+      backgroundColor: const Color(0xFF6699CC),
       appBar: AppBar(
-        backgroundColor: Color(0xFF6699CC),
+        backgroundColor: const Color(0xFF6699CC),
         leading: Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
           child: InkWell(
             onTap: () {
               Navigator.pop(context);
             },
-            splashColor: Color(0xFF6699CC),
-            hoverColor: Color(0xFF6699CC),
+            splashColor: const Color(0xFF6699CC),
+            hoverColor: const Color(0xFF6699CC),
             child: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
               ),
               padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
-              child: Icon(Icons.arrow_back_ios, size: 20),
+              child: const Icon(Icons.arrow_back_ios, size: 20),
             ),
           ),
         ),
-        title: Padding(
-          padding: const EdgeInsets.only(top: 22),
+        title: const Padding(
+          padding: EdgeInsets.only(top: 22),
           child: Center(
             child: Text(
               'Yêu thích',
@@ -77,15 +81,15 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
             padding: const EdgeInsets.fromLTRB(0, 16, 16, 0),
             child: InkWell(
               onTap: () {},
-              splashColor: Color(0xFF6699CC),
-              hoverColor: Color(0xFF6699CC),
+              splashColor: const Color(0xFF6699CC),
+              hoverColor: const Color(0xFF6699CC),
               child: Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
                 ),
                 padding: const EdgeInsets.all(8.0),
-                child: Icon(Icons.favorite, size: 20),
+                child: const Icon(Icons.favorite, size: 20),
               ),
             ),
           ),
@@ -95,10 +99,10 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: isLoading
-              ? Center(child: CircularProgressIndicator())
+              ? const Center(child: CircularProgressIndicator())
               : favoriteShoes.isNotEmpty
                   ? GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         crossAxisSpacing: 16,
                         mainAxisSpacing: 16,
@@ -106,10 +110,13 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                       ),
                       itemCount: favoriteShoes.length,
                       itemBuilder: (context, index) {
-                        return ProductCard(shoe: favoriteShoes[index]);
+                        // return ProductCard(
+                        //   // shoe: favoriteShoes[index],
+                        //   // onAddToCart: () => _addToCart(favoriteShoes[index]),
+                        // );
                       },
                     )
-                  : Center(child: Text('No favorite shoes found')),
+                  : const Center(child: Text('No favorite shoes found')),
         ),
       ),
     );
