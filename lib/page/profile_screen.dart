@@ -117,9 +117,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => EditProfileScreen(
-                          // token: widget.token,
-                          // userId: widget.userId,
-                          // user: user, // Pass user data
+                          token: widget.token,
+                          userId: widget.userId,
+                          user: user, // Pass user data
                         ),
                       ),
                     );
