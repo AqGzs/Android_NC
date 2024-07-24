@@ -13,11 +13,15 @@ class AuthService {
       );
       if (response.statusCode == 200) {
         return response.data;
-      } else {
-        throw Exception('Failed to login');
+      } 
+      else if(response.statusCode == 401){
+         throw Exception('Lỗi tài khoản hoặc mật khẩu');
+      }
+      else {
+        throw Exception('Đăng nhập thất bại');
       }
     } catch (error) {
-      throw Exception('Failed to login: $error');
+      throw Exception('Đăng nhập thất bại: $error');
     }
   }
 

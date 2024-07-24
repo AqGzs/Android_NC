@@ -37,58 +37,7 @@ class NotificationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFF6699CC),
-      appBar: AppBar(
-        backgroundColor: Color(0xFF6699CC),
-        leading: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
-          child: InkWell(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            splashColor: Color(0xFF6699CC),
-            hoverColor: Color(0xFF6699CC),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
-              child: Icon(Icons.arrow_back_ios, size: 20),
-            ),
-          ),
-        ),
-        title: Padding(
-          padding: const EdgeInsets.only(top: 24),
-          child: Center(
-            child: Text(
-              'Thông báo',
-              style: TextStyle(
-                fontSize: 20.0,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 16, 16, 0),
-            child: InkWell(
-              onTap: () {},
-              splashColor: Color(0xFF6699CC),
-              hoverColor: Color(0xFF6699CC),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                padding: const EdgeInsets.all(8.0),
-                child: Icon(Icons.delete, size: 20),
-              ),
-            ),
-          ),
-        ],
-      ),
+      
       body: Padding(
         padding: EdgeInsets.only(top: 20),
         child: Column(

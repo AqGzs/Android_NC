@@ -99,43 +99,52 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.shoe.brand,
+                      widget.shoe.brand ,
                       style: TextStyle(
                         color: Color(0xFF5B9EE1),
-                        fontSize: 16.0,
+                        fontSize: 30.0,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 8),
+                           SizedBox(height: 8),
                     Text(
                       widget.shoe.name,
                       style: TextStyle(
-                        fontSize: 22.0,
+                        fontSize: 20.0,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
                     ),
                     SizedBox(height: 8),
                     Text(
-                      widget.shoe.isOutOfStock ? 'Hết hàng' : 'Còn hàng',
+                    widget.shoe.isOutOfStock ? 'Hết hàng' : 'Còn hàng',
                       style: TextStyle(
-                        fontSize: 18.0,
+                        fontSize: 20.0,
                         color: Colors.black,
                       ),
                     ),
                     SizedBox(height: 16),
+                    Text(  
+                       'Mô tả:', style: 
+                       TextStyle(
+                        fontSize: 30.0,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),),
+                
                     Text(
-                      'Nike Air Jordan là dòng giày bóng rổ của Nike, nổi bật với phong cách và thiết kế độc đáo, nó còn có sự ảnh hưởng lớn trong thể thao và thời trang...',
+                      
+                    "   " + widget.shoe.descriptions,
                       style: TextStyle(
-                        fontSize: 18.0,
+                        fontSize: 20.0,
                         color: Colors.black,
                       ),
                     ),
-                    SizedBox(height: 16),
+                    SizedBox(height: 30),
                     Text(
                       'MÀU SẮC',
                       style: TextStyle(
-                        fontSize: 18.0,
+                        fontSize: 25.0,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
@@ -192,7 +201,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             Text(
                               'GIÁ SẢN PHẨM',
                               style: TextStyle(
-                                fontSize: 18.0,
+                                fontSize: 25.0,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
@@ -200,9 +209,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             Text(
                               '${widget.shoe.price}đ',
                               style: TextStyle(
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.normal,
+                                fontSize: 30.0,
+                                fontWeight: FontWeight.bold,
                                 color: Colors.blue,
+             
                               ),
                             ),
                           ],
@@ -220,7 +230,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           child: Text(
                             'Thêm vào giỏ',
                             style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 25,
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                             ),

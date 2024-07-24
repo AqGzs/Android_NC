@@ -8,6 +8,7 @@ class Shoe {
   final List<String> colors;
   final String imageUrl;
   final List<Stock> stocks;
+  final String descriptions;
 
   Shoe({
     required this.id,
@@ -17,6 +18,7 @@ class Shoe {
     required this.colors,
     required this.imageUrl,
     required this.stocks,
+    required this.descriptions
   });
 
   factory Shoe.fromJson(Map<String, dynamic> json) {
@@ -30,6 +32,7 @@ class Shoe {
       stocks: json['stocks'] != null && json['stocks'].isNotEmpty
           ? List<Stock>.from(json['stocks'].map((stock) => Stock.fromJson(stock)))
           : [],
+      descriptions: json['descriptions']
     );
   }
 
@@ -42,6 +45,7 @@ class Shoe {
       'colors': colors,
       'imageUrl': imageUrl,
       'stocks': stocks.map((stock) => stock.toJson()).toList(),
+      'descriptions': descriptions,
     };
   }
 

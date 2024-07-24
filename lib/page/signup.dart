@@ -176,7 +176,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                icon: Image.asset('images/logo_google.png', height: 24),
+                icon: Image.asset('assets/images/logo_google.png', height: 24),
                 label: Text(
                   'Đăng ký với Google',
                   style: TextStyle(

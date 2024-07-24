@@ -131,7 +131,7 @@ class _ProductCardState extends State<ProductCard> {
                   ),
                   child: Image.network(
                     widget.shoe.imageUrl,
-                    height: 110, // Adjusted height to prevent overflow
+                    height: 110,
                     width: double.infinity,
                     fit: BoxFit.contain,
                   ),
@@ -163,7 +163,7 @@ class _ProductCardState extends State<ProductCard> {
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
-                    maxLines: 1, // Ensuring the name doesn't overflow
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 3.0),
@@ -181,7 +181,7 @@ class _ProductCardState extends State<ProductCard> {
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
-                  ),  
+                  ),
                 ],
               ),
             ),
@@ -199,28 +199,5 @@ class _ProductCardState extends State<ProductCard> {
         ),
       ),
     );
-  }
-
-  Color _getColorFromName(String colorName) {
-    switch (colorName.toLowerCase()) {
-      case 'blue':
-        return Colors.blue;
-      case 'green':
-        return Colors.green;
-      case 'grey':
-        return Colors.grey;
-      case 'red':
-        return Colors.red;
-      case 'orange':
-        return Colors.orange;
-      case 'black':
-        return Colors.black;
-      case 'white':
-        return Colors.white;
-      case 'yellow':
-        return Colors.yellow;
-      default:
-        return Colors.transparent;
-    }
   }
 }

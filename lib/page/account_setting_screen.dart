@@ -12,58 +12,6 @@ class AccountSettingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Color(0xFF6699CC),
-          leading: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
-            child: InkWell(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              splashColor: Color(0xFF6699CC),
-              hoverColor: Color(0xFF6699CC),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
-                child: Icon(Icons.arrow_back_ios, size: 20),
-              ),
-            ),
-          ),
-          title: Padding(
-            padding: const EdgeInsets.only(top: 24),
-            child: Center(
-              child: Text(
-                'Cài đặt',
-                style: TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 16, 16, 0),
-              child: InkWell(
-                onTap: () {},
-                splashColor: Color(0xFF6699CC),
-                hoverColor: Color(0xFF6699CC),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon(Icons.person, size: 20),
-                ),
-              ),
-            ),
-          ],
-        ),
         backgroundColor: Color(0xFF6699CC),
         body: Padding(
           padding: const EdgeInsets.fromLTRB(16, 30, 16, 15),
@@ -177,7 +125,7 @@ class AccountSettingScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              Spacer(),
+              SizedBox(height: 30,),
               ElevatedButton.icon(
                 onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => StartPage()));

@@ -185,13 +185,13 @@ class _ProductListScreenState extends State<ProductListScreen> {
               ? Center(child: CircularProgressIndicator())
               : shoes.isNotEmpty
                   ? GridView.builder(
-                      padding: EdgeInsets.all(16.0),
+                      padding: EdgeInsets.all(5.0),
                       itemCount: shoes.length,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        childAspectRatio: 0.8,
+                        mainAxisSpacing: 10,
+                        childAspectRatio: 0.73,
                       ),
                       itemBuilder: (context, index) {
                         return ProductCard(

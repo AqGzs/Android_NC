@@ -21,7 +21,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
 
   Future<void> _loadFavoriteShoes() async {
     try {
-      var response = await Dio().get('http://172.168.1.113:3000/api/favorites'); // Replace with your API URL
+      var response = await Dio().get('http://192.168.1.172:3000/api/favorites'); // Replace with your API URL
       List<dynamic> data = response.data;
       print('Data loaded: $data');
       setState(() {
@@ -45,58 +45,6 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF6699CC),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF6699CC),
-        leading: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
-          child: InkWell(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            splashColor: const Color(0xFF6699CC),
-            hoverColor: const Color(0xFF6699CC),
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
-              child: const Icon(Icons.arrow_back_ios, size: 20),
-            ),
-          ),
-        ),
-        title: const Padding(
-          padding: EdgeInsets.only(top: 22),
-          child: Center(
-            child: Text(
-              'Yêu thích',
-              style: TextStyle(
-                fontSize: 20.0,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 16, 16, 0),
-            child: InkWell(
-              onTap: () {},
-              splashColor: const Color(0xFF6699CC),
-              hoverColor: const Color(0xFF6699CC),
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                padding: const EdgeInsets.all(8.0),
-                child: const Icon(Icons.favorite, size: 20),
-              ),
-            ),
-          ),
-        ],
-      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),

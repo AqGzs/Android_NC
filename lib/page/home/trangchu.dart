@@ -24,6 +24,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   late List<Widget> _screens;
+  late List<String> _titles;
 
   @override
   void initState() {
@@ -34,6 +35,7 @@ class _HomePageState extends State<HomePage> {
       NotificationScreen(),
       AccountSettingScreen(token: widget.token, userId: widget.userId),
     ];
+    _titles = ['F5Store', 'Yêu thích', 'Thông báo', 'Cài đặt'];
   }
 
   void _onItemTapped(int index) {
@@ -52,11 +54,11 @@ class _HomePageState extends State<HomePage> {
         leading: Icon(Icons.menu),
         title: Center(
           child: Text(
-            'F5Store',
+            _titles[_selectedIndex],
             style: TextStyle(
               fontSize: 20.0,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: Color.fromARGB(255, 238, 238, 236),
             ),
           ),
         ),
@@ -95,13 +97,12 @@ class _HomePageState extends State<HomePage> {
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.amber[800],
-          unselectedItemColor: Colors.grey,
+        unselectedItemColor: Colors.grey,
         onTap: _onItemTapped,
       ),
     );
   }
 }
-
 class HomePageContent extends StatefulWidget {
   final String token;
   final String userId;
