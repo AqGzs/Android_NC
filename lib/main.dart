@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_doanlt/page/Intro.dart';
 import 'package:flutter_doanlt/page/login.dart';
 import 'package:flutter_doanlt/page/start.dart';
 void main() {
@@ -27,7 +28,7 @@ class ShoeApp extends StatelessWidget {
           backgroundColor: Color(0xFF6699CC),
         ),
       ),
-      home: SignInScreen(),
+      home: IntroPage(),
     );
   }
 }

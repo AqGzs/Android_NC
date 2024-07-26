@@ -1,16 +1,15 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_doanlt/api_service/shoe_service.dart';
+import 'package:flutter_doanlt/favorite/favorite.dart';
 import 'package:flutter_doanlt/models/shoe.dart';
 import 'package:flutter_doanlt/notification/notification.dart';
 import 'package:flutter_doanlt/page/account_setting_screen.dart';
-import 'package:flutter_doanlt/page/favorite/favorite.dart';
 import 'package:flutter_doanlt/page/home/category_button.dart';
 import 'package:flutter_doanlt/page/home/product_card1.dart';
 import 'package:flutter_doanlt/page/productDetailScreen.dart';
 import 'package:flutter_doanlt/page/product_list/product_list_screen.dart';
 import 'package:flutter_doanlt/page/search.dart';
-
 class HomePage extends StatefulWidget {
   final String token;
   final String userId;
@@ -103,6 +102,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
 class HomePageContent extends StatefulWidget {
   final String token;
   final String userId;

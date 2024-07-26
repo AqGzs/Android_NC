@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_doanlt/api_service/cart_service.dart';
 import 'package:flutter_doanlt/api_service/user_service.dart';
 import 'package:flutter_doanlt/models/user.dart';
+import 'package:intl/intl.dart';
 import 'cart_item.dart'; // Import the CartItem widget
 import 'checkout_screen.dart'; // Import the CheckoutScreen
 
@@ -19,8 +20,11 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   List<Map<String, dynamic>> cartItems = [];
   final CartService cartService = CartService();
-
-
+  
+  String formatPrice(double price) {
+    final NumberFormat formatter = NumberFormat('#,###');
+    return formatter.format(price).replaceAll(',', '.') + ' ' + 'VNĐ';
+  }
   @override
   void initState() {
     super.initState();
@@ -153,7 +157,8 @@ class _CartScreenState extends State<CartScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('Tổng tiền hàng', style: TextStyle(fontSize: 18)),
-                      Text('${totalAmount.toStringAsFixed(0)}đ',
+                      Text(
+                        formatPrice(totalAmount) ,
                           style: TextStyle(fontSize: 18)),
                     ],
                   ),
@@ -164,7 +169,8 @@ class _CartScreenState extends State<CartScreen> {
                       Text('Tổng thanh toán',
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold)),
-                      Text('${totalAmount.toStringAsFixed(0)}đ',
+                      Text(
+                         formatPrice(totalAmount),
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold)),
                     ],

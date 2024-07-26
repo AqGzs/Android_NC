@@ -5,6 +5,7 @@ import 'package:flutter_doanlt/models/shoe.dart';
 import 'package:flutter_doanlt/models/stock.dart';
 import 'package:flutter_doanlt/page/favorite_button.dart';
 import 'package:flutter_doanlt/page/productDetailScreen.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProductCard extends StatefulWidget {
@@ -19,6 +20,10 @@ class ProductCard extends StatefulWidget {
 class _ProductCardState extends State<ProductCard> {
   bool _isFavorite = false;
 
+ String formatPrice(double price) {
+    final NumberFormat formatter = NumberFormat('#,###');
+    return formatter.format(price).replaceAll(',', '.') + ' ' + 'VNĐ';
+  }
 @override
   void initState() {
     super.initState();
@@ -216,7 +221,7 @@ class _ProductCardState extends State<ProductCard> {
                         ),
                         SizedBox(height: 3.0),
                         Text(
-                          '${widget.shoe.price}đ',
+                         formatPrice(widget.shoe.price),
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,

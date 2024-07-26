@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class CartItem extends StatelessWidget {
   final Map<String, dynamic> item;
@@ -14,6 +15,11 @@ class CartItem extends StatelessWidget {
     required this.onRemoveItem,
     required this.onQuantityChanged,
   });
+
+ String formatPrice(double price) {
+    final NumberFormat formatter = NumberFormat('#,###');
+    return formatter.format(price).replaceAll(',', '.') + ' ' + 'VNĐ';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,18 +62,21 @@ class CartItem extends StatelessWidget {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   overflow: TextOverflow.ellipsis,
                 ),
+                SizedBox(height: 5),
                 Text(
-                  '${(item['price'] as double)}đ', // Kiểm tra kiểu dữ liệu cho giá
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                  formatPrice(item['price'] as double) ,
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  overflow: TextOverflow.ellipsis,
                 ),
+                SizedBox(height: 5),
                 Text(
-                  'Size: ${item['size'] ?? 'N/A'}', // Xử lý trường hợp không có size
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                  'Size: ${item['size'] ?? 'N/A'}',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
               ],
             ),
           ),
-          Row(
+          Column(
             children: [
               IconButton(
                 icon: Icon(Icons.remove_circle_outline),

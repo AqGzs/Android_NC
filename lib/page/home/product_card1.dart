@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_doanlt/models/shoe.dart';
 import 'package:flutter_doanlt/page/favorite_button.dart';
 import 'package:flutter_doanlt/page/productDetailScreen.dart';
+import 'package:intl/intl.dart';
 
 class ProductCard1 extends StatelessWidget {
   final Shoe shoe;
@@ -15,6 +16,11 @@ class ProductCard1 extends StatelessWidget {
         builder: (context) => ProductDetailScreen(shoe: shoe),
       ),
     );
+  }
+
+  String formatPrice(double price) {
+    final NumberFormat formatter = NumberFormat('#,###');
+    return formatter.format(price).replaceAll(',', '.') + ' ' + 'VNĐ';
   }
 
   @override
@@ -64,7 +70,7 @@ class ProductCard1 extends StatelessWidget {
                           ),
                           SizedBox(height: 12.0),
                           Text(
-                            '${shoe.price}đ',
+                            formatPrice(shoe.price),
                             style: TextStyle(
                               fontSize: 16.0,
                               color: const Color.fromARGB(255, 0, 0, 0),
@@ -92,7 +98,7 @@ class ProductCard1 extends StatelessWidget {
                           Positioned(
                             top: 20.0,
                             left: 10.0,
-                            child: FavoriteButton(shoe: shoe,),
+                            child: FavoriteButton(shoe: shoe),
                           ),
                         ],
                       ),

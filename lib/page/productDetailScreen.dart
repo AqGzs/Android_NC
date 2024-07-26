@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_doanlt/models/shoe.dart';
+import 'package:intl/intl.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Shoe shoe;
@@ -20,7 +21,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     selectedColor = widget.shoe.colors.isNotEmpty ? widget.shoe.colors[0] : '';
     selectedSize = widget.shoe.stocks.isNotEmpty ? widget.shoe.stocks[0].size ?? 0 : 0;
   }
-
+  String formatPrice(double price) {
+    final NumberFormat formatter = NumberFormat('#,###');
+    return formatter.format(price).replaceAll(',', '.') + 'đ';
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -207,9 +211,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               ),
                             ),
                             Text(
-                              '${widget.shoe.price}đ',
+                            formatPrice(widget.shoe.price) +'VNĐ',
                               style: TextStyle(
-                                fontSize: 30.0,
+                                fontSize: 25.0,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.blue,
              
@@ -230,7 +234,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           child: Text(
                             'Thêm vào giỏ',
                             style: TextStyle(
-                              fontSize: 25,
+                              fontSize: 20,
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                             ),

@@ -4,6 +4,7 @@ import 'package:flutter_doanlt/page/home/trangchu.dart';
 import 'package:flutter_doanlt/api_service/cart_service.dart';
 import 'package:flutter_doanlt/api_service/user_service.dart';
 import 'package:flutter_doanlt/models/user.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class CheckoutScreen extends StatefulWidget {
@@ -25,13 +26,18 @@ class CheckoutScreen extends StatefulWidget {
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
   List<Map<String, dynamic>> cartItems = [];
-  final int discount = 40900;
+  final double discount = 40900;
   final CartService cartService = CartService();
   final UserService userService = UserService();
   late Future<User> userFuture;
   String selectedPaymentMethod = 'Thẻ Paypal';
   String? apiurl;
   final Dio _dio = Dio();
+
+   String formatPrice(double price) {
+    final NumberFormat formatter = NumberFormat('#,###');
+    return formatter.format(price).replaceAll(',', '.') + ' ' + 'VNĐ';
+  }
 
   @override
   void initState() {
@@ -225,15 +231,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Tổng tiền hàng', style: TextStyle(fontSize: 18)),
-                  Text('${widget.totalAmount.toStringAsFixed(0)}đ', style: TextStyle(fontSize: 18)),
+                  Text(
+                  'Tổng tiền hàng', style: TextStyle(fontSize: 18)),
+                  Text(
+                      formatPrice(widget.totalAmount), style: TextStyle(fontSize: 18)),
                 ],
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('Chiết khấu', style: TextStyle(fontSize: 18)),
-                  Text('-${discount.toStringAsFixed(0)}đ', style: TextStyle(fontSize: 18)),
+                 Text(
+                   formatPrice(discount ), style: TextStyle(fontSize: 18)),
                 ],
               ),
               Divider(),
@@ -242,7 +251,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 children: [
                   Text('Tổng thanh toán',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  Text('${finalAmount.toStringAsFixed(0)}đ',
+                  Text(
+                    formatPrice(finalAmount),
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 ],
               ),
