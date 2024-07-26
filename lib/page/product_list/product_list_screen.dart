@@ -49,11 +49,15 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
   Future<void> _loadCart() async {
     CartService cartService = CartService();
-    List<Map<String, dynamic>> fetchedCartItems = await cartService.getCartItems(widget.userId, widget.token);
-    setState(() {
-      cartItems = fetchedCartItems;
-      totalItemsInCart = fetchedCartItems.fold(0, (sum, item) => sum + (item['quantity'] as int));
-    });
+    try {
+      List<Map<String, dynamic>> fetchedCartItems = await cartService.getCartItems(widget.userId, widget.token);
+      setState(() {
+        cartItems = fetchedCartItems;
+        totalItemsInCart = fetchedCartItems.fold(0, (sum, item) => sum + (item['quantity'] as int));
+      });
+    } catch (e) {
+      print('Error loading cart items: $e');
+    }
   }
 
   void _openFilterSheet() {
@@ -72,33 +76,63 @@ class _ProductListScreenState extends State<ProductListScreen> {
       },
     );
   }
+Future<void> _addToCart(Shoe shoe, Stock stock, int quantity) async {
+  CartService cartService = CartService();
 
-  Future<void> _addToCart(Shoe shoe, Stock stock, int quantity) async {
-    CartService cartService = CartService();
-    await cartService.createCart(widget.userId, shoe.id, stock.id, quantity, widget.token);
+  // Validate cart item data before proceeding
+  if (shoe.id == null || stock.id == null || quantity == null) {
+    print('Invalid cart item data: shoe.id=${shoe.id}, stock.id=${stock.id}, quantity=$quantity');
+    return;
+  }
+
+  Map<String, dynamic> cartItem = {
+    'productId': shoe.id,
+    'quantity': quantity,
+    'stockId': stock.id,
+    'title': shoe.name,
+    'image': shoe.imageUrl,
+    'price': shoe.price,
+    'size': stock.size,
+  };
+
+  // Check if the item with the same product ID and stock ID already exists in the cart
+  var existingItem = cartItems.firstWhere(
+    (item) => item['productId'] == shoe.id && item['stockId'] == stock.id,
+    orElse: () => <String, dynamic>{},
+  );
+
+  if (existingItem.isNotEmpty) {
+    // Update the quantity of the existing item
     setState(() {
-      totalItemsInCart += quantity;
-      cartItems.add({
-        'title': shoe.name,
-        'price': shoe.price,
-        'size': stock.size,
-        'quantity': quantity,
-        'image': shoe.imageUrl,
-      });
-      print('Cart items: $cartItems');
-      print('Total items in cart: $totalItemsInCart');
+      existingItem['quantity'] += quantity;
+    });
+  } else {
+    // Add a new item with the new stock ID
+    setState(() {
+      cartItems.add(cartItem);
     });
   }
 
+  // Send the updated cart to the server
+  await cartService.createCart(widget.userId, cartItems, widget.token);
+
+  setState(() {
+    totalItemsInCart += quantity;
+  });
+}
+
+
+
   Future<void> _navigateToCartScreen() async {
-    CartService cartService = CartService();
-    List<Map<String, dynamic>> fetchedCartItems = await cartService.getCartItems(widget.userId, widget.token);
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CartScreen(cartItems: fetchedCartItems),
+        builder: (context) => CartScreen(cartItems: cartItems),
       ),
-    );
+    ).then((_) {
+      // Refresh cart items when returning from CartScreen
+      _loadCart();
+    });
   }
 
   @override
@@ -191,12 +225,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
                         crossAxisCount: 2,
                         crossAxisSpacing: 16,
                         mainAxisSpacing: 10,
-                        childAspectRatio: 0.73,
+                        childAspectRatio: 0.730,
                       ),
                       itemBuilder: (context, index) {
                         return ProductCard(
                           shoe: shoes[index],
-                          onAddToCart: (shoe, stockId, quantity) => _addToCart(shoes[index], stockId, quantity),
+                          onAddToCart: (shoe, stock, quantity) => _addToCart(shoe, stock, quantity),
                         );
                       },
                     )
