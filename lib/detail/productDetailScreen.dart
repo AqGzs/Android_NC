@@ -18,7 +18,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   void initState() {
     super.initState();
     selectedColor = widget.shoe.colors.isNotEmpty ? widget.shoe.colors[0] : '';
-    selectedSize = widget.shoe.stocks.isNotEmpty ? widget.shoe.stocks[0].size ??0 : 0;
+    selectedSize = widget.shoe.stocks.isNotEmpty ? widget.shoe.stocks[0].size ?? 0 : 0;
   }
 
   @override
@@ -90,7 +90,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: Color(0xFFD3E2E9),
+                color: Colors.white,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
               ),
               child: SingleChildScrollView(
@@ -101,7 +101,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     Text(
                       widget.shoe.brand,
                       style: TextStyle(
-                        color: Color(0xFF5B9EE1),
+                        color: Colors.black,
                         fontSize: 16.0,
                         fontWeight: FontWeight.bold,
                       ),
@@ -125,9 +125,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ),
                     SizedBox(height: 16),
                     Text(
-                      'Nike Air Jordan là dòng giày bóng rổ của Nike, nổi bật với phong cách và thiết kế độc đáo, nó còn có sự ảnh hưởng lớn trong thể thao và thời trang...',
+                      widget.shoe.descriptions,
                       style: TextStyle(
-                        fontSize: 18.0,
+                        fontSize: 16.0,
                         color: Colors.black,
                       ),
                     ),
