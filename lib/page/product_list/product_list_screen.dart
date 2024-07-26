@@ -20,6 +20,7 @@ class ProductListScreen extends StatefulWidget {
 
 class _ProductListScreenState extends State<ProductListScreen> {
   List<Shoe> shoes = [];
+  List<Shoe> allShoes = [];
   List<Map<String, dynamic>> cartItems = [];
   bool isLoading = true;
   int totalItemsInCart = 0;
@@ -30,6 +31,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
     _loadProducts();
     _loadCart();
   }
+
+
 
   Future<void> _loadProducts() async {
     ShoeService apiService = ShoeService();
@@ -68,11 +71,14 @@ class _ProductListScreenState extends State<ProductListScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return FilterSheet(onFilterApplied: (filteredShoes) {
-          setState(() {
-            shoes = filteredShoes;
-          });
-        });
+        return FilterSheet(
+          onFilterApplied: (filteredShoes) {
+            setState(() {
+              shoes = filteredShoes;
+            });
+          },
+          allShoes: allShoes,
+        );
       },
     );
   }

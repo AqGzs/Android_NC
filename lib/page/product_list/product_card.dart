@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_doanlt/page/productDetailScreen.dart';
 import 'package:flutter_doanlt/models/shoe.dart';
 import 'package:flutter_doanlt/models/stock.dart';
 import 'package:flutter_doanlt/page/favorite_button.dart';
+import 'package:flutter_doanlt/page/productDetailScreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProductCard extends StatefulWidget {
   final Shoe shoe;
@@ -13,8 +16,42 @@ class ProductCard extends StatefulWidget {
   @override
   _ProductCardState createState() => _ProductCardState();
 }
-
 class _ProductCardState extends State<ProductCard> {
+  bool _isFavorite = false;
+
+@override
+  void initState() {
+    super.initState();
+    _loadFavoriteStatus();
+  }
+
+  void _loadFavoriteStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isFavorite = prefs.getBool(widget.shoe.id) ?? false;
+    });
+  }
+
+  void _toggleFavorite() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isFavorite = !_isFavorite;
+      prefs.setBool(widget.shoe.id, _isFavorite);
+
+      List<String> favoriteShoes = prefs.getStringList('favoriteShoes') ?? [];
+      if (_isFavorite) {
+        favoriteShoes.add(jsonEncode(widget.shoe.toJson()));
+      } else {
+        favoriteShoes.removeWhere((shoeJson) {
+          Shoe shoe = Shoe.fromJson(jsonDecode(shoeJson));
+          return shoe.id == widget.shoe.id;
+        });
+      }
+      prefs.setStringList('favoriteShoes', favoriteShoes);
+    });
+  }
+
+
   void _showAddToCartDialog(BuildContext context) {
     int quantity = 1;
     int selectedSize = widget.shoe.stocks.isNotEmpty ? widget.shoe.stocks.first.size : 0;
