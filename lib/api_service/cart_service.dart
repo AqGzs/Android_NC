@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_doanlt/api_service/dio_config.dart';
+import 'package:flutter_doanlt/models/order.dart';
 
 class CartService {
   final Dio _dio = DioConfig.instance;
@@ -71,6 +72,19 @@ class CartService {
     }
   }
 
+     Future<Order> checkout(String userId) async {
+    try {
+      final response = await _dio.post('/$userId');
+      if (response.statusCode == 201) {
+        return Order.fromJson(response.data['order']);
+      } else {
+        throw Exception('Failed to checkout');
+      }
+    } catch (e) {
+      print(e);
+      throw Exception('Failed to checkout');  
+    }
+  }
 
    Future<void> updateCartItemQuantity(String cartItemId, int quantity, String token) async {
     try {
