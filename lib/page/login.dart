@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_doanlt/api_service/auth_service.dart';
 import 'package:flutter_doanlt/page/home/trangchu.dart';
 import 'package:flutter_doanlt/page/resetpassword_screen.dart';
-
-
 import 'signup.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -93,7 +91,7 @@ class _SignInScreenState extends State<SignInScreen> {
         ),
       ),
       backgroundColor: Color(0xFF6699CC),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
         child: Form(
           key: _formKey,
@@ -190,7 +188,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                 ),
               ),
-              Spacer(),
+              SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

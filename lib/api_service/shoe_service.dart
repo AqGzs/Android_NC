@@ -80,4 +80,23 @@ class ShoeService {
       throw Exception('Failed to delete shoe: $error');
     }
   }
+     Future<List<Shoe>> searchShoes(String query, String token) async {
+    try {
+      final response = await _dio.get(
+        '/shoes',
+        queryParameters: {'search': query},
+        options: Options(headers: {
+          'Authorization': 'Bearer $token',
+        }),
+      );
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data;
+        return data.map((json) => Shoe.fromJson(json)).toList();
+      } else {
+        throw Exception('Failed to fetch shoes');
+      }
+    } catch (error) {
+      throw Exception('Failed to fetch shoes: $error');
+    }
+  }
 }

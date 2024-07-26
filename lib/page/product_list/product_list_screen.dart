@@ -113,13 +113,19 @@ Future<void> _addToCart(Shoe shoe, Stock stock, int quantity) async {
     });
   }
 
-  // Send the updated cart to the server
-  await cartService.createCart(widget.userId, cartItems, widget.token);
+  // Calculate total price
+  double totalPrice = cartItems.fold(0, (sum, item) => sum + item['price'] * item['quantity']);
 
+  // Send the updated cart to the server
+  await cartService.createCart(widget.userId, cartItems, totalPrice, widget.token);
+
+  // Recalculate total items in cart
   setState(() {
-    totalItemsInCart += quantity;
+    totalItemsInCart = cartItems.fold(0, (total, item) => total + item['quantity'] as int);
   });
 }
+
+
 
 
 
@@ -127,7 +133,7 @@ Future<void> _addToCart(Shoe shoe, Stock stock, int quantity) async {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CartScreen(cartItems: cartItems),
+        builder: (context) => CartScreen(cartItems: cartItems, userId: widget.userId, token: widget.token,),
       ),
     ).then((_) {
       // Refresh cart items when returning from CartScreen

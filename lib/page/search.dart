@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_doanlt/data/ApiService.dart';
-import 'package:flutter_doanlt/data/Model/shoe.dart';
+import 'package:flutter_doanlt/api_service/shoe_service.dart';
+import 'package:flutter_doanlt/models/shoe.dart';
+
 class SearchScreen extends StatefulWidget {
   final String token;
 
@@ -28,7 +29,7 @@ class _SearchScreenState extends State<SearchScreen> {
     });
 
     try {
-      final results = await ApiService().searchShoes(query, widget.token);
+      final results = await ShoeService().searchShoes(query, widget.token);
       setState(() {
         _searchResults = results;
       });

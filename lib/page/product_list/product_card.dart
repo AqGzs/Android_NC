@@ -145,54 +145,57 @@ class _ProductCardState extends State<ProductCard> {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
-                  Text(
-                    widget.shoe.brand,
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.shoe.brand,
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 3.0),
+                        Text(
+                          widget.shoe.name,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 3.0),
+                        Text(
+                          widget.shoe.isOutOfStock ? 'Hết hàng' : 'Còn hàng',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        SizedBox(height: 3.0),
+                        Text(
+                          '${widget.shoe.price}đ',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  SizedBox(height: 3.0),
-                  Text(
-                    widget.shoe.name,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 3.0),
-                  Text(
-                    widget.shoe.isOutOfStock ? 'Hết hàng' : 'Còn hàng',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  SizedBox(height: 3.0),
-                  Text(
-                    '${widget.shoe.price}đ',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  IconButton(
+                    icon: Icon(Icons.add_shopping_cart),
+                    color: Colors.blue,
+                    onPressed: () {
+                      _showAddToCartDialog(context);
+                    },
                   ),
                 ],
-              ),
-            ),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: IconButton(
-                icon: Icon(Icons.add_shopping_cart),
-                color: Colors.blue,
-                onPressed: () {
-                  _showAddToCartDialog(context);
-                },
               ),
             ),
           ],

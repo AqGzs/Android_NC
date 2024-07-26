@@ -23,6 +23,7 @@ class CartItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
+        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.5), blurRadius: 5, offset: Offset(0, 3))],
       ),
       child: Row(
         children: [
@@ -33,6 +34,16 @@ class CartItem extends StatelessWidget {
               width: 75,
               height: 75,
               fit: BoxFit.cover,
+              loadingBuilder: (context, child, progress) {
+                if (progress == null) {
+                  return child;
+                } else {
+                  return Center(child: CircularProgressIndicator());
+                }
+              },
+              errorBuilder: (context, error, stackTrace) {
+                return Icon(Icons.error, size: 75);
+              },
             ),
           ),
           SizedBox(width: 10),
@@ -46,11 +57,11 @@ class CartItem extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  '${item['price'].toStringAsFixed(0)}đ',
+                  '${(item['price'] as double)}đ', // Kiểm tra kiểu dữ liệu cho giá
                   style: TextStyle(fontSize: 18, color: Colors.grey),
                 ),
                 Text(
-                  'Size: ${(item['size'] as int).toString()}',
+                  'Size: ${item['size'] ?? 'N/A'}', // Xử lý trường hợp không có size
                   style: TextStyle(fontSize: 18, color: Colors.grey),
                 ),
               ],

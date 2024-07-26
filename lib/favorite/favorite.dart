@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_doanlt/data/Model/shoe.dart' as data_model_shoe;
+import 'package:flutter_doanlt/models/shoe.dart';
 
 class FavoriteScreen extends StatefulWidget {
   @override
@@ -8,7 +8,7 @@ class FavoriteScreen extends StatefulWidget {
 }
 
 class _FavoriteScreenState extends State<FavoriteScreen> {
-  List<data_model_shoe.Shoe> favoriteShoes = [];
+  List<Shoe> favoriteShoes = [];
   bool isLoading = true;
 
   @override
@@ -23,7 +23,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
       List<dynamic> data = response.data;
       print('Data loaded: $data');
       setState(() {
-        favoriteShoes = data.map((json) => data_model_shoe.Shoe.fromJson(json)).toList();
+        favoriteShoes = data.map((json) => Shoe.fromJson(json)).toList();
         isLoading = false;
       });
     } catch (e) {
@@ -34,7 +34,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
     }
   }
 
-  void _addToCart(data_model_shoe.Shoe shoe) {
+  void _addToCart(Shoe shoe) {
     // Implement add to cart functionality here
     print('Added to cart: ${shoe.name}');
   }

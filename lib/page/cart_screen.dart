@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_doanlt/api_service/cart_service.dart';
+import 'package:flutter_doanlt/api_service/user_service.dart';
+import 'package:flutter_doanlt/models/user.dart';
 import 'cart_item.dart'; // Import the CartItem widget
+import 'checkout_screen.dart'; // Import the CheckoutScreen
 
 class CartScreen extends StatefulWidget {
   final List<Map<String, dynamic>> cartItems;
+  final String userId;
+  final String token;
 
-  CartScreen({required this.cartItems});
+  CartScreen({required this.cartItems, required this.userId, required this.token});
 
   @override
   _CartScreenState createState() => _CartScreenState();
@@ -12,6 +18,8 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   List<Map<String, dynamic>> cartItems = [];
+  final CartService cartService = CartService();
+
 
   @override
   void initState() {
@@ -45,11 +53,36 @@ class _CartScreenState extends State<CartScreen> {
     });
   }
 
+  Future<void> _checkout() async {
+    final totalAmount = cartItems.fold(
+            0.0,
+         (sum, item) => sum + ((item['price'] ?? 0.0) * ((item['quantity'] ?? 0) as int)),
+          );
+      // Xử lý logic thanh toán với thông tin người dùng và các mục trong giỏ hàng
+      print('Cart Items: ${cartItems.length}');
+      
+      await cartService.createCart(widget.userId,cartItems,totalAmount, widget.token );
+
+      // Navigate to the CheckoutScreen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CheckoutScreen(
+            token: widget.token,
+            userId: widget.userId,
+            cartItems: cartItems,
+            totalAmount: totalAmount
+          ),
+        ),
+      );
+    
+  }
+
   @override
   Widget build(BuildContext context) {
-    final int totalAmount = cartItems.fold(
-      0,
-      (sum, item) => sum + ((item['price'] ?? 0) as int) * ((item['quantity'] ?? 0) as int),
+    final double totalAmount = cartItems.fold(
+      0.0,
+      (sum, item) => sum + ((item['price'] ?? 0.0) * ((item['quantity'] ?? 0) as int)),
     );
 
     return Scaffold(
@@ -138,9 +171,7 @@ class _CartScreenState extends State<CartScreen> {
                   ),
                   SizedBox(height: 10),
                   ElevatedButton(
-                    onPressed: () {
-                      // Thực hiện hành động khi đặt hàng
-                    },
+                    onPressed: _checkout,
                     child: Text('Đặt hàng',
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),

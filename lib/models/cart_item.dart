@@ -1,19 +1,21 @@
+import 'package:flutter_doanlt/models/stock.dart';
+
 class CartItem {
   final String productId;
   final int quantity;
-  final String stockId;
+  final Stock stock;
 
   CartItem({
     required this.productId,
     required this.quantity,
-    required this.stockId,
+    required this.stock,
   });
 
   factory CartItem.fromJson(Map<String, dynamic> json) {
     return CartItem(
       productId: json['productId'] ?? '',
       quantity: json['quantity'] ?? 0,
-      stockId: json['stock'] ?? '', 
+      stock: Stock.fromJson(json['stock'] ?? {}),
     );
   }
 
@@ -21,7 +23,7 @@ class CartItem {
     return {
       'productId': productId,
       'quantity': quantity,
-      'stock': stockId,
+      'stock': stock.toJson(),
     };
   }
 }

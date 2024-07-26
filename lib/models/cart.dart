@@ -4,7 +4,7 @@ class Cart {
   final String id;
   final String userId;
   final List<CartItem> items;
-  final int totalPrice; // Đảm bảo totalPrice là int
+  final double totalPrice; // Đảm bảo totalPrice là int
 
   Cart({
     required this.id,
