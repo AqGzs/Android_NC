@@ -44,6 +44,31 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return await userService.getUserDetails(widget.userId, widget.token);
   }
 
+  Future<void> saveOrder() async {
+    try {
+      final response = await _dio.post(
+        '/order',
+        data: {
+          'userId': widget.userId,
+          'cartItems': widget.cartItems,
+          'totalAmount': widget.totalAmount,
+        },
+        options: Options(
+          headers: {'Content-Type': 'application/json; charset=UTF-8'},
+        ),
+      );
+
+      if (response.statusCode == 201) {
+        print('Order saved successfully');
+      } else {
+        print('Failed to save order');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+
   Future<void> _initiatePayment(String appUser) async {
     try {
       final response = await _dio.post(
