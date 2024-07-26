@@ -1,37 +1,37 @@
 import 'package:flutter/material.dart';
-
-import 'package:flutter_doanlt/api_service/shoe_service.dart';
- 
 import 'package:flutter_doanlt/models/shoe.dart';
-import 'package:intl/intl.dart'; 
+import 'package:intl/intl.dart';
+
 class FilterSheet extends StatefulWidget {
   final Function(List<Shoe>) onFilterApplied;
+  final List<Shoe> allShoes;
 
-  FilterSheet({required this.onFilterApplied});
+  FilterSheet({required this.onFilterApplied, required this.allShoes});
 
   @override
   _FilterSheetState createState() => _FilterSheetState();
 }
 
 class _FilterSheetState extends State<FilterSheet> {
-  int size = 41;
-  RangeValues priceRange = RangeValues(50000, 350000);
+  RangeValues priceRange = RangeValues(100000, 200000);
   final NumberFormat currencyFormatter = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
 
   void resetFilters() {
     setState(() {
-      size = 41;
       priceRange = RangeValues(50000, 350000);
     });
+    widget.onFilterApplied(widget.allShoes);
+    Navigator.pop(context);
   }
 
-  void applyFilters() async {
-    ShoeService apiService = ShoeService();
-    List<Shoe> filteredShoes = await apiService.getShoes(
-      size: size,
-      minPrice: priceRange.start.toInt(),
-      maxPrice: priceRange.end.toInt(),
-    );
+  void applyFilters() {
+    List<Shoe> filteredShoes = widget.allShoes.where((shoe) {
+      return shoe.price >= priceRange.start && shoe.price <= priceRange.end;
+    }).toList();
+
+    // Sort the filtered shoes by price
+    filteredShoes.sort((a, b) => a.price.compareTo(b.price));
+
     widget.onFilterApplied(filteredShoes);
     Navigator.pop(context);
   }
@@ -59,25 +59,6 @@ class _FilterSheetState extends State<FilterSheet> {
                 onPressed: resetFilters,
                 child: Text('Đặt lại', style: TextStyle(fontSize: 16, color: Colors.grey)),
               ),
-            ],
-          ),
-          SizedBox(height: 20.0),
-          Text('Kích cỡ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-          SizedBox(height: 10.0),
-          Wrap(
-            spacing: 8.0,
-            children: [
-              for (int i = 38; i <= 43; i++)
-                ChoiceChip(
-                  label: Text('$i'),
-                  selected: size == i,
-                  selectedColor: Color(0xFF6699CC),
-                  onSelected: (selected) {
-                    setState(() {
-                      size = i;
-                    });
-                  },
-                ),
             ],
           ),
           SizedBox(height: 20.0),
