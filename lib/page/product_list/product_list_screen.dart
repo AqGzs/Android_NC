@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_doanlt/api_service/cart_service.dart';
 import 'package:flutter_doanlt/api_service/shoe_service.dart';
 import 'package:flutter_doanlt/models/shoe.dart';
@@ -7,6 +8,7 @@ import 'package:flutter_doanlt/page/cart_screen.dart';
 import 'package:flutter_doanlt/page/filter.dart';
 import 'package:flutter_doanlt/page/product_list/product_card.dart';
 import 'package:flutter_doanlt/page/search.dart';
+import 'package:flutter_doanlt/provider/cart_provider.dart';
 
 class ProductListScreen extends StatefulWidget {
   final String userId;
@@ -21,33 +23,15 @@ class ProductListScreen extends StatefulWidget {
 class _ProductListScreenState extends State<ProductListScreen> {
   List<Shoe> shoes = [];
   List<Shoe> allShoes = [];
-  List<Map<String, dynamic>> cartItems = [];
   bool isLoading = true;
-  int totalItemsInCart = 0;
+  List<Map<String, dynamic>> cartItems = [];
+  final CartService cartService  = CartService();
 
   @override
   void initState() {
     super.initState();
-    _loadProducts();
     _loadCart();
-  }
-
-
-
-  Future<void> _loadProducts() async {
-    ShoeService apiService = ShoeService();
-    try {
-      List<Shoe> fetchedShoes = await apiService.getShoes();
-      setState(() {
-        shoes = fetchedShoes;
-        isLoading = false;
-      });
-    } catch (e) {
-      print('Error loading products: $e');
-      setState(() {
-        isLoading = false;
-      });
-    }
+    _loadProducts();
   }
 
   Future<void> _loadCart() async {
@@ -56,10 +40,27 @@ class _ProductListScreenState extends State<ProductListScreen> {
       List<Map<String, dynamic>> fetchedCartItems = await cartService.getCartItems(widget.userId, widget.token);
       setState(() {
         cartItems = fetchedCartItems;
-        totalItemsInCart = fetchedCartItems.fold(0, (sum, item) => sum + (item['quantity'] as int));
       });
+      Provider.of<CartProvider>(context, listen: false).loadCartItems(fetchedCartItems);
     } catch (e) {
       print('Error loading cart items: $e');
+    }
+  }
+
+  Future<void> _loadProducts() async {
+    ShoeService apiService = ShoeService();
+    try {
+      List<Shoe> fetchedShoes = await apiService.getShoes();
+      setState(() {
+        shoes = fetchedShoes;
+        allShoes = fetchedShoes;
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error loading products: $e');
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -82,73 +83,31 @@ class _ProductListScreenState extends State<ProductListScreen> {
       },
     );
   }
-Future<void> _addToCart(Shoe shoe, Stock stock, int quantity) async {
-  CartService cartService = CartService();
 
-  // Validate cart item data before proceeding
-  if (shoe.id == null || stock.id == null || quantity == null) {
-    print('Invalid cart item data: shoe.id=${shoe.id}, stock.id=${stock.id}, quantity=$quantity');
-    return;
-  }
+ Future<void> _addToCart(Shoe shoe, Stock stock, int quantity) async {
+  Provider.of<CartProvider>(context, listen: false).addToCart(shoe, stock, quantity);
 
-  Map<String, dynamic> cartItem = {
-    'productId': shoe.id,
-    'quantity': quantity,
-    'stockId': stock.id,
-    'title': shoe.name,
-    'image': shoe.imageUrl,
-    'price': shoe.price,
-    'size': stock.size,
-  };
-
-  // Check if the item with the same product ID and stock ID already exists in the cart
-  var existingItem = cartItems.firstWhere(
-    (item) => item['productId'] == shoe.id && item['stockId'] == stock.id,
-    orElse: () => <String, dynamic>{},
-  );
-
-  if (existingItem.isNotEmpty) {
-    // Update the quantity of the existing item
-    setState(() {
-      existingItem['quantity'] += quantity;
-    });
-  } else {
-    // Add a new item with the new stock ID
-    setState(() {
-      cartItems.add(cartItem);
-    });
-  }
-
-  // Calculate total price
-  double totalPrice = cartItems.fold(0, (sum, item) => sum + item['price'] * item['quantity']);
-
-  // Send the updated cart to the server
-  await cartService.createCart(widget.userId, cartItems, totalPrice, widget.token);
-
-  // Recalculate total items in cart
-  setState(() {
-    totalItemsInCart = cartItems.fold(0, (total, item) => total + item['quantity'] as int);
-  });
+  double totalPrice = Provider.of<CartProvider>(context, listen: false).items.fold(0, (sum, item) => sum + item['price'] * item['quantity']);
+  
+  await CartService().createCart(widget.userId, Provider.of<CartProvider>(context, listen: false).items, totalPrice, widget.token);
 }
 
-
-
-
+  
 
   Future<void> _navigateToCartScreen() async {
-    Navigator.push(
+    await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CartScreen(cartItems: cartItems, userId: widget.userId, token: widget.token,),
+        builder: (context) => CartScreen(userId: widget.userId, token: widget.token,),
       ),
-    ).then((_) {
-      // Refresh cart items when returning from CartScreen
-      _loadCart();
-    });
+    );
+    _loadCart();
   }
 
   @override
   Widget build(BuildContext context) {
+    int totalItemsInCart = Provider.of<CartProvider>(context).itemCount;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xFF6699CC),
@@ -243,6 +202,8 @@ Future<void> _addToCart(Shoe shoe, Stock stock, int quantity) async {
                         return ProductCard(
                           shoe: shoes[index],
                           onAddToCart: (shoe, stock, quantity) => _addToCart(shoe, stock, quantity),
+                          userId: widget.userId,
+                          token: widget.token,
                         );
                       },
                     )

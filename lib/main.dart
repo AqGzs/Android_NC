@@ -2,33 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:flutter_doanlt/page/Intro.dart';
 import 'package:flutter_doanlt/page/login.dart';
 import 'package:flutter_doanlt/page/start.dart';
-void main() {
-  //runApp(const MainApp());
-  runApp(ShoeApp());
-}
+import 'package:flutter_doanlt/provider/cart_provider.dart';
+import 'package:provider/provider.dart';
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: StartPage()
-    );
-  }
+void main() {
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+        // Other providers...
+      ],
+      child: ShoeApp(),
+    ),
+  );
 }
 class ShoeApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        scaffoldBackgroundColor: Color(0xFF6699CC),
-        appBarTheme: AppBarTheme(
-          backgroundColor: Color(0xFF6699CC),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => CartProvider()),
+        // Add other providers here if needed
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          scaffoldBackgroundColor: Color(0xFF6699CC),
+          appBarTheme: AppBarTheme(
+            backgroundColor: Color(0xFF6699CC),
+          ),
         ),
+        home: SignInScreen(),
       ),
-      home: IntroPage(),
     );
   }
 }

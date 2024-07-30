@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_doanlt/api_service/cart_service.dart';
+import 'package:flutter_doanlt/api_service/shoe_service.dart';
 import 'package:flutter_doanlt/models/shoe.dart';
+import 'package:flutter_doanlt/models/stock.dart';
+import 'package:flutter_doanlt/page/cart_screen.dart';
+import 'package:flutter_doanlt/provider/cart_provider.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Shoe shoe;
+  final String userId;
+  final String token;
 
-  ProductDetailScreen({required this.shoe});
+  ProductDetailScreen({required this.shoe, required this.userId, required this.token});
 
   @override
   _ProductDetailScreenState createState() => _ProductDetailScreenState();
@@ -14,17 +22,52 @@ class ProductDetailScreen extends StatefulWidget {
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   String selectedColor = '';
   int selectedSize = 0;
+  final CartService cartService  = CartService();
+  List<Shoe> shoes = [];
+  List<Shoe> allShoes = [];
+  List<Map<String, dynamic>> cartItems = [];
+  bool isLoading = true;
+ 
 
   @override
   void initState() {
     super.initState();
     selectedColor = widget.shoe.colors.isNotEmpty ? widget.shoe.colors[0] : '';
-    selectedSize = widget.shoe.stocks.isNotEmpty ? widget.shoe.stocks[0].size ?? 0 : 0;
+    selectedSize = widget.shoe.stocks.isNotEmpty ? widget.shoe.stocks[0].size  : 0;
+    _loadCart();
+
   }
+
   String formatPrice(double price) {
     final NumberFormat formatter = NumberFormat('#,###');
-    return formatter.format(price).replaceAll(',', '.') + 'đ';
+    return formatter.format(price).replaceAll(',', '.') + 'VNĐ';
   }
+Future<void> _addToCart(Shoe shoe, Stock stock, int quantity) async {
+  Provider.of<CartProvider>(context, listen: false).addToCart(shoe, stock, quantity);
+
+  double totalPrice = Provider.of<CartProvider>(context, listen: false).items.fold(0, (sum, item) => sum + item['price'] * item['quantity']);
+  
+  await CartService().createCart(widget.userId, Provider.of<CartProvider>(context, listen: false).items, totalPrice, widget.token);
+}
+
+
+  
+  Future<void> _loadCart() async {
+    CartService cartService = CartService();
+    try {
+      List<Map<String, dynamic>> fetchedCartItems = await cartService.getCartItems(widget.userId, widget.token);
+      setState(() {
+        cartItems = fetchedCartItems;
+      });
+      // Update cart provider
+      Provider.of<CartProvider>(context, listen: false).loadCartItems(fetchedCartItems);
+    } catch (e) {
+      print('Error loading cart items: $e');
+    }
+  }
+  
+ 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,16 +109,44 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(0, 16, 16, 0),
             child: InkWell(
-              onTap: () {},
+              onTap: () {
+                // Navigate to cart screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CartScreen( userId: widget.userId, token: widget.token,)),
+                );
+              },
               splashColor: Color(0xFF6699CC),
               hoverColor: Color(0xFF6699CC),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                padding: const EdgeInsets.all(8.0),
-                child: Icon(Icons.shopping_bag, size: 20),
+              child: Stack(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(Icons.shopping_bag, size: 20),
+                  ),
+                  Positioned(
+                    right: 0,
+                    child: Consumer<CartProvider>(
+                      builder: (context, cart, child) {
+                        return CircleAvatar(
+                          radius: 10,
+                          backgroundColor: Colors.red,
+                          child: Text(
+                            '${cart.itemCount}',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -103,14 +174,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.shoe.brand ,
+                      widget.shoe.brand,
                       style: TextStyle(
                         color: Color(0xFF5B9EE1),
                         fontSize: 30.0,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                           SizedBox(height: 8),
+                    SizedBox(height: 8),
                     Text(
                       widget.shoe.name,
                       style: TextStyle(
@@ -121,24 +192,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ),
                     SizedBox(height: 8),
                     Text(
-                    widget.shoe.isOutOfStock ? 'Hết hàng' : 'Còn hàng',
+                      widget.shoe.isOutOfStock ? 'Hết hàng' : 'Còn hàng',
                       style: TextStyle(
                         fontSize: 20.0,
                         color: Colors.black,
                       ),
                     ),
                     SizedBox(height: 16),
-                    Text(  
-                       'Mô tả:', style: 
-                       TextStyle(
+                    Text(
+                      'Mô tả:',
+                      style: TextStyle(
                         fontSize: 30.0,
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
-                      ),),
-                
+                      ),
+                    ),
                     Text(
-                      
-                    "   " + widget.shoe.descriptions,
+                      "   " + widget.shoe.descriptions,
                       style: TextStyle(
                         fontSize: 20.0,
                         color: Colors.black,
@@ -185,7 +255,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         return GestureDetector(
                           onTap: () {
                             setState(() {
-                              selectedSize = stock.size!;
+                              selectedSize = stock.size;
                             });
                           },
                           child: SizeOption(
@@ -211,18 +281,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               ),
                             ),
                             Text(
-                            formatPrice(widget.shoe.price) +'VNĐ',
+                              formatPrice(widget.shoe.price) + 'VNĐ',
                               style: TextStyle(
                                 fontSize: 25.0,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.blue,
-             
                               ),
                             ),
                           ],
                         ),
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            Stock selectedStock = widget.shoe.stocks.firstWhere((stock) => stock.size == selectedSize);
+                            await _addToCart(widget.shoe, selectedStock, 1);
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue,
                             padding: EdgeInsets.symmetric(
@@ -251,6 +323,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ),
     );
   }
+
   Color _getColor(String color) {
     switch (color.toLowerCase()) {
       case 'black':

@@ -1,40 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_doanlt/api_service/cart_service.dart';
-import 'package:flutter_doanlt/api_service/user_service.dart';
-import 'package:flutter_doanlt/models/user.dart';
 import 'package:intl/intl.dart';
-import 'cart_item.dart'; // Import the CartItem widget
-import 'checkout_screen.dart'; // Import the CheckoutScreen
+import 'package:provider/provider.dart';
+import 'cart_item.dart';
+import 'checkout_screen.dart';
+import '../provider/cart_provider.dart';
 
 class CartScreen extends StatefulWidget {
-  final List<Map<String, dynamic>> cartItems;
   final String userId;
   final String token;
-
-  CartScreen({required this.cartItems, required this.userId, required this.token});
+  
+  CartScreen({required this.userId, required this.token});
 
   @override
   _CartScreenState createState() => _CartScreenState();
 }
 
 class _CartScreenState extends State<CartScreen> {
-  List<Map<String, dynamic>> cartItems = [];
   final CartService cartService = CartService();
-  
+
   String formatPrice(double price) {
     final NumberFormat formatter = NumberFormat('#,###');
     return formatter.format(price).replaceAll(',', '.') + ' ' + 'VNĐ';
-  }
-  @override
-  void initState() {
-    super.initState();
-    cartItems = widget.cartItems;
   }
 
   void _increaseQuantity(Map<String, dynamic> item) {
     setState(() {
       item['quantity'] = (item['quantity'] ?? 0) + 1;
     });
+    Provider.of<CartProvider>(context, listen: false).loadCartItems([...Provider.of<CartProvider>(context, listen: false).items]);
   }
 
   void _decreaseQuantity(Map<String, dynamic> item) {
@@ -43,11 +37,12 @@ class _CartScreenState extends State<CartScreen> {
         item['quantity'] = (item['quantity'] ?? 0) - 1;
       }
     });
+    Provider.of<CartProvider>(context, listen: false).loadCartItems([...Provider.of<CartProvider>(context, listen: false).items]);
   }
 
   void _removeItem(Map<String, dynamic> item) {
     setState(() {
-      cartItems.remove(item);
+      Provider.of<CartProvider>(context, listen: false).items.remove(item);
     });
   }
 
@@ -55,35 +50,34 @@ class _CartScreenState extends State<CartScreen> {
     setState(() {
       item['quantity'] = newQuantity;
     });
+    Provider.of<CartProvider>(context, listen: false).loadCartItems([...Provider.of<CartProvider>(context, listen: false).items]);
   }
 
   Future<void> _checkout() async {
+    final cartItems = Provider.of<CartProvider>(context, listen: false).items;
     final totalAmount = cartItems.fold(
-            0.0,
-         (sum, item) => sum + ((item['price'] ?? 0.0) * ((item['quantity'] ?? 0) as int)),
-          );
-      // Xử lý logic thanh toán với thông tin người dùng và các mục trong giỏ hàng
-      print('Cart Items: ${cartItems.length}');
-      
-      await cartService.createCart(widget.userId,cartItems,totalAmount, widget.token );
+      0.0,
+      (sum, item) => sum + ((item['price'] ?? 0.0) * ((item['quantity'] ?? 0) as int)),
+    );
 
-      // Navigate to the CheckoutScreen
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => CheckoutScreen(
-            token: widget.token,
-            userId: widget.userId,
-            cartItems: cartItems,
-            totalAmount: totalAmount
-          ),
+    await cartService.createCart(widget.userId, cartItems, totalAmount, widget.token);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CheckoutScreen(
+          token: widget.token,
+          userId: widget.userId,
+          cartItems: cartItems,
+          totalAmount: totalAmount,
         ),
-      );
-    
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final cartItems = Provider.of<CartProvider>(context).items;
     final double totalAmount = cartItems.fold(
       0.0,
       (sum, item) => sum + ((item['price'] ?? 0.0) * ((item['quantity'] ?? 0) as int)),
@@ -158,8 +152,9 @@ class _CartScreenState extends State<CartScreen> {
                     children: [
                       Text('Tổng tiền hàng', style: TextStyle(fontSize: 18)),
                       Text(
-                        formatPrice(totalAmount) ,
-                          style: TextStyle(fontSize: 18)),
+                        formatPrice(totalAmount),
+                        style: TextStyle(fontSize: 18),
+                      ),
                     ],
                   ),
                   Divider(),
@@ -170,9 +165,9 @@ class _CartScreenState extends State<CartScreen> {
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold)),
                       Text(
-                         formatPrice(totalAmount),
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold)),
+                        formatPrice(totalAmount),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
                     ],
                   ),
                   SizedBox(height: 10),

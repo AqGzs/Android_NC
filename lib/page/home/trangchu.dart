@@ -285,7 +285,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                   ? SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: Row(
-                                        children: shoes.map((shoe) => ProductCard1(shoe: shoe)).toList(),
+                                        children: shoes.map((shoe) => ProductCard1(shoe: shoe, token: widget.token, userId: widget.userId,)).toList(),
                                       ),
                                     )
                                   : Center(child: Text('Không tìm thấy sản phẩm')),
@@ -302,7 +302,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => ProductDetailScreen(shoe: shoes.first), // Assuming you pass a shoe
+                                      builder: (context) => ProductDetailScreen(shoe: shoes.first, token: widget.token, userId: widget.userId,), // Assuming you pass a shoe
                                     ),
                                   );
                                 },
@@ -315,7 +315,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                   ? SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: Row(
-                                        children: shoes.map((shoe) => ProductCard1(shoe: shoe)).toList(),
+                                        children: shoes.map((shoe) => ProductCard1(shoe: shoe, token: widget.token, userId: widget.userId,)).toList(),
                                       ),
                                     )
                                   : Center(child: Text('Không tìm thấy sản phẩm')),

@@ -42,7 +42,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   @override
   void initState() {
     super.initState();
-    apiurl = 'https://7486-113-22-221-150.ngrok-free.app';
+    apiurl = 'https://0378-14-161-49-244.ngrok-free.app';
     userFuture = _fetchUserDetails();
   }
 

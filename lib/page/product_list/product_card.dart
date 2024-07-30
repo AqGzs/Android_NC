@@ -11,20 +11,24 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ProductCard extends StatefulWidget {
   final Shoe shoe;
   final Function(Shoe, Stock, int) onAddToCart;
+  final String userId;
+  final String token;
 
-  ProductCard({required this.shoe, required this.onAddToCart});
+  ProductCard({required this.shoe, required this.onAddToCart, required this.userId, required this.token});
 
   @override
   _ProductCardState createState() => _ProductCardState();
 }
+
 class _ProductCardState extends State<ProductCard> {
   bool _isFavorite = false;
 
- String formatPrice(double price) {
+  String formatPrice(double price) {
     final NumberFormat formatter = NumberFormat('#,###');
     return formatter.format(price).replaceAll(',', '.') + ' ' + 'VNĐ';
   }
-@override
+
+  @override
   void initState() {
     super.initState();
     _loadFavoriteStatus();
@@ -55,7 +59,6 @@ class _ProductCardState extends State<ProductCard> {
       prefs.setStringList('favoriteShoes', favoriteShoes);
     });
   }
-
 
   void _showAddToCartDialog(BuildContext context) {
     int quantity = 1;
@@ -141,7 +144,7 @@ class _ProductCardState extends State<ProductCard> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProductDetailScreen(shoe: widget.shoe),
+            builder: (context) => ProductDetailScreen(shoe: widget.shoe, token: widget.token, userId: widget.userId),
           ),
         );
       },
@@ -156,7 +159,7 @@ class _ProductCardState extends State<ProductCard> {
               color: Colors.grey.withOpacity(0.5),
               spreadRadius: 1,
               blurRadius: 5,
-              offset: Offset(0, 3), // changes position of shadow
+              offset: Offset(0, 3),
             ),
           ],
         ),
@@ -221,7 +224,7 @@ class _ProductCardState extends State<ProductCard> {
                         ),
                         SizedBox(height: 3.0),
                         Text(
-                         formatPrice(widget.shoe.price),
+                          formatPrice(widget.shoe.price),
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,

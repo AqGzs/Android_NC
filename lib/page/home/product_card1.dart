@@ -6,14 +6,16 @@ import 'package:intl/intl.dart';
 
 class ProductCard1 extends StatelessWidget {
   final Shoe shoe;
-
-  ProductCard1({required this.shoe});
+  final String userId;
+  final String token;
+  ProductCard1({required this.shoe, required this.token, required this.userId});
 
   void _navigateToDetailScreen(BuildContext context) {
+  
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ProductDetailScreen(shoe: shoe),
+        builder: (context) => ProductDetailScreen(shoe: shoe, token: token, userId: userId,),
       ),
     );
   }

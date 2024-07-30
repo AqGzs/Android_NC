@@ -34,34 +34,34 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF6699CC),
        
-      body: Padding(
-        padding: const EdgeInsets.only(top: 16),
-        child: favoriteShoes.isNotEmpty
-            ? GridView.builder(
-                padding: const EdgeInsets.all(16.0),
-                itemCount: favoriteShoes.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 0.8,
-                ),
-                itemBuilder: (context, index) {
-                  return ProductCard(
-                    shoe: favoriteShoes[index],
-                    onAddToCart: (shoe, stock, quantity) {
-                      // Implement add to cart if needed
-                    },
-                  );
-                },
-              )
-            : const Center(
-                child: Text(
-                  'Không có sản phẩm yêu thích',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-      ),
+      // body: Padding(
+      //   padding: const EdgeInsets.only(top: 16),
+      //   child: favoriteShoes.isNotEmpty
+      //       ? GridView.builder(
+      //           padding: const EdgeInsets.all(16.0),
+      //           itemCount: favoriteShoes.length,
+      //           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      //             crossAxisCount: 2,
+      //             crossAxisSpacing: 16,
+      //             mainAxisSpacing: 16,
+      //             childAspectRatio: 0.8,
+      //           ),
+      //           // itemBuilder: (context, index) {
+      //           //   return ProductCard(
+      //           //     shoe: favoriteShoes[index],
+      //           //     onAddToCart: (shoe, stock, quantity) {
+      //           //       // Implement add to cart if needed
+      //           //     },
+      //           //   );
+      //           // },
+      //         )
+      //       : const Center(
+      //           child: Text(
+      //             'Không có sản phẩm yêu thích',
+      //             style: TextStyle(color: Colors.white),
+      //           ),
+      //         ),
+      // ),
     );
   }
 }
