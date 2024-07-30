@@ -40,7 +40,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   String formatPrice(double price) {
     final NumberFormat formatter = NumberFormat('#,###');
-    return formatter.format(price).replaceAll(',', '.') + 'VNĐ';
+    return formatter.format(price).replaceAll(',', '.') + ' ' +'VNĐ';
   }
 Future<void> _addToCart(Shoe shoe, Stock stock, int quantity) async {
   Provider.of<CartProvider>(context, listen: false).addToCart(shoe, stock, quantity);
@@ -281,7 +281,7 @@ Future<void> _addToCart(Shoe shoe, Stock stock, int quantity) async {
                               ),
                             ),
                             Text(
-                              formatPrice(widget.shoe.price) + 'VNĐ',
+                              formatPrice(widget.shoe.price) ,
                               style: TextStyle(
                                 fontSize: 25.0,
                                 fontWeight: FontWeight.bold,

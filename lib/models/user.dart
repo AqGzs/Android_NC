@@ -8,7 +8,7 @@ class User {
   final DateTime? dob;
   final String? gender;
   final String? phone;
-  final String? imageUrl;
+  final String? avatar;
 
   User({
     required this.name,
@@ -18,7 +18,7 @@ class User {
     this.address,
     this.gender,
     this.phone,
-    this.imageUrl,
+    this.avatar,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -30,7 +30,7 @@ class User {
       dob: json['dob'] != null ? DateTime.parse(json['dob']) : null,
       gender: json['gender'],
       phone: json['phone'],
-      imageUrl: json['imageUrl'],
+      avatar: json['avatar'],
     );
   }
 
@@ -43,7 +43,7 @@ class User {
       'dob': dob?.toIso8601String(),
       'gender': gender,
       'phone': phone,
-      'imageUrl': imageUrl,
+      'avatar': avatar,
     };
   }
 
