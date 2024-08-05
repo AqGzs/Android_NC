@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_doanlt/page/login.dart';
+import 'package:flutter_doanlt/page/sign_in.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   @override

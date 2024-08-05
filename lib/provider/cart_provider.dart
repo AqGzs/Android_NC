@@ -16,6 +16,7 @@ class CartProvider with ChangeNotifier {
       'image': shoe.imageUrl,
       'price': shoe.price,
       'size': stock.size,
+      'colors': shoe.colors
     };
 
     var existingItem = _items.firstWhere(

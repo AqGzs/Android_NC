@@ -1,56 +1,62 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_doanlt/api_service/auth_service.dart';
-import 'package:flutter_doanlt/models/user.dart';
+import 'package:flutter_doanlt/page/home/home_page.dart';
+import 'package:flutter_doanlt/page/resetpassword_screen.dart';
+import 'sign_up.dart';
 
-import 'login.dart';
-class SignUpScreen extends StatefulWidget {
+class SignInScreen extends StatefulWidget {
   @override
-  _SignUpScreenState createState() => _SignUpScreenState();
+  _SignInScreenState createState() => _SignInScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
+class _SignInScreenState extends State<SignInScreen> {
+  bool _obscurePassword = true;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _agreeToTerms = false;
-  bool _obscurePassword = true;
+  final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   final AuthService _authService = AuthService();
+  String? _token;
+  String? _userId;
 
-  Future<void> _register() async {
+  Future<void> _login() async {
     if (_formKey.currentState?.validate() ?? false) {
-      if (!_agreeToTerms) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Please agree to the terms and conditions')),
-        );
-        return;
-      }
-
       setState(() {
         _isLoading = true;
       });
 
       try {
-        final user = User(
-          name: _nameController.text,
-          email: _emailController.text,
-          password: _passwordController.text,
+        final Map<String, dynamic> response = await _authService.login(
+          _emailController.text,
+          _passwordController.text,
         );
-        final registeredUser = await _authService.register(user);
-        // Handle successful registration
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Đăng ký thành côn, user: ${registeredUser.toJson()}')),
-        );
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => SignInScreen()),
-        );
+
+        if (response.containsKey('token') && response.containsKey('userId')) {
+          setState(() {
+            _token = response['token'];
+            _userId = response['userId'];
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Đăng nhập thành công')),
+          );
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomePage(
+                token: _token!,
+                userId: _userId!,
+              ),
+            ),
+          );
+        } else {
+          throw Exception('Đăng nhập thất bại');
+        }
       } catch (error) {
-        // Handle registration error
+        print('Error during login: $error'); // Log the error
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Đăng ký thất bại: $error')),
+          SnackBar(content: Text('Sai tài khoản hoặc mật khẩu')),
         );
       } finally {
         setState(() {
@@ -85,71 +91,66 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
       ),
       backgroundColor: Color(0xFF6699CC),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
         child: Form(
           key: _formKey,
-          child: ListView(
+          child: Column(
             children: [
-              SizedBox(height: 16),
-                Center(
-                  child: Text(
-                    'Chào mừng !',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
+              SizedBox(height: 20),
               Text(
-                'Hãy đăng ký ngay để có những trải nghiệm hấp dẫn nhé !',
+                'Xin chào ! 👋',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              Text(
+                'Chào mừng bạn quay trở lại !',
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.black,
                 ),
               ),
-              SizedBox(height: 30),
-              _buildTextField(
-                controller: _nameController,
-                label: 'Họ và tên đầy đủ',
-                hintText: 'Nhập họ và tên',
-              ),
-              SizedBox(height: 16),
+              SizedBox(height: 40),
               _buildTextField(
                 controller: _emailController,
                 label: 'Địa chỉ email',
                 hintText: 'Nhập địa chỉ email',
-                keyboardType: TextInputType.emailAddress,
               ),
-              SizedBox(height: 16),
+              SizedBox(height: 20),
               _buildPasswordField(
                 controller: _passwordController,
                 label: 'Mật khẩu',
                 hintText: 'Nhập mật khẩu',
               ),
-              SizedBox(height: 16),
-              Row(
-                children: [
-                  Checkbox(
-                    value: _agreeToTerms,
-                    onChanged: (value) {
-                      setState(() {
-                        _agreeToTerms = value!;
-                      });
+              SizedBox(height: 4),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ResetPasswordScreen(),
+                        ),
+                      );
                     },
+                    child: Text(
+                      'Quên mật khẩu?',
+                      style: TextStyle(color: Colors.black),
+                    ),
                   ),
-                  Text(
-                    'Tôi đồng ý tất cả các điều khoản',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ],
+                ),
               ),
-              SizedBox(height: 30),
+              SizedBox(height: 40),
               _isLoading
                   ? CircularProgressIndicator()
                   : ElevatedButton(
-                      onPressed: _register,
+                      onPressed: _login,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFFFFE279),
                         minimumSize: Size(double.infinity, 55),
@@ -158,11 +159,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ),
                       child: Text(
-                        'Đăng ký',
+                        'Đăng nhập',
                         style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold),
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
               SizedBox(height: 20),
@@ -178,11 +180,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 icon: Image.asset('assets/images/logo_google.png', height: 24),
                 label: Text(
-                  'Đăng ký với Google',
+                  'Đăng nhập với Google',
                   style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold),
+                    color: Colors.black,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               SizedBox(height: 20),
@@ -190,7 +193,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Đã có tài khoản?',
+                    'Chưa có tài khoản?',
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 18,
@@ -198,14 +201,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.pushReplacement(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => SignInScreen()),
+                          builder: (context) => SignUpScreen(),
+                        ),
                       );
                     },
                     child: Text(
-                      ' Đăng nhập ngay',
+                      ' Đăng ký ngay',
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 18,
@@ -255,7 +259,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
               borderRadius: BorderRadius.circular(30.0),
               borderSide: BorderSide(color: Colors.white),
             ),
-            contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            contentPadding:
+                EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -313,7 +318,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 },
               ),
             ),
-            contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            contentPadding:
+                EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {

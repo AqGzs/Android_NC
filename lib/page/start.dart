@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_doanlt/page/signup.dart';
+import 'package:flutter_doanlt/page/sign_up.dart';
 
-import 'login.dart';
+import 'sign_in.dart';
 
 class StartPage extends StatelessWidget {
   @override

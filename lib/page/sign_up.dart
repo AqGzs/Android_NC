@@ -1,62 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_doanlt/api_service/auth_service.dart';
-import 'package:flutter_doanlt/page/home/trangchu.dart';
-import 'package:flutter_doanlt/page/resetpassword_screen.dart';
-import 'signup.dart';
+import 'package:flutter_doanlt/models/user.dart';
+import 'sign_in.dart';
 
-class SignInScreen extends StatefulWidget {
+class SignUpScreen extends StatefulWidget {
   @override
-  _SignInScreenState createState() => _SignInScreenState();
+  _SignUpScreenState createState() => _SignUpScreenState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
-  bool _obscurePassword = true;
+class _SignUpScreenState extends State<SignUpScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
+  bool _agreeToTerms = false;
+  bool _obscurePassword = true;
   bool _isLoading = false;
   final AuthService _authService = AuthService();
-  String? _token;
-  String? _userId;
 
-  Future<void> _login() async {
+  Future<void> _register() async {
     if (_formKey.currentState?.validate() ?? false) {
+      if (!_agreeToTerms) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Vui lòng đồng ý với các điều khoản và điều kiện')),
+        );
+        return;
+      }
+
       setState(() {
         _isLoading = true;
       });
 
       try {
-        final Map<String, dynamic> response = await _authService.login(
-          _emailController.text,
-          _passwordController.text,
+        final user = User(
+          name: _nameController.text,
+          email: _emailController.text,
+          password: _passwordController.text,
         );
-
-        if (response.containsKey('token') && response.containsKey('userId')) {
-          setState(() {
-            _token = response['token'];
-            _userId = response['userId'];
-          });
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Đăng nhập thành công')),
-          );
-
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => HomePage(
-                token: _token!,
-                userId: _userId!,
-              ),
-            ),
-          );
-        } else {
-          throw Exception('Đăng nhập thất bại');
-        }
-      } catch (error) {
-        print('Error during login: $error'); // Log the error
+        await _authService.register(user);
+        // Handle successful registration
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Đăng nhập thất bại: $error')),
+          SnackBar(content: Text('Đăng ký thành công')),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => SignInScreen()),
+        );
+      } catch (error) {
+        // Handle registration error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error.toString())),
         );
       } finally {
         setState(() {
@@ -91,66 +84,71 @@ class _SignInScreenState extends State<SignInScreen> {
         ),
       ),
       backgroundColor: Color(0xFF6699CC),
-      body: SingleChildScrollView(
+      body: Padding(
         padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
         child: Form(
           key: _formKey,
-          child: Column(
+          child: ListView(
             children: [
-              SizedBox(height: 20),
-              Text(
-                'Xin chào ! 👋',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+              SizedBox(height: 16),
+              Center(
+                child: Text(
+                  'Chào mừng !',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
                 ),
               ),
               Text(
-                'Chào mừng bạn quay trở lại !',
+                'Hãy đăng ký ngay để có những trải nghiệm hấp dẫn nhé !',
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.black,
                 ),
               ),
-              SizedBox(height: 40),
+              SizedBox(height: 30),
+              _buildTextField(
+                controller: _nameController,
+                label: 'Họ và tên đầy đủ',
+                hintText: 'Nhập họ và tên',
+              ),
+              SizedBox(height: 16),
               _buildTextField(
                 controller: _emailController,
                 label: 'Địa chỉ email',
                 hintText: 'Nhập địa chỉ email',
+                keyboardType: TextInputType.emailAddress,
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 16),
               _buildPasswordField(
                 controller: _passwordController,
                 label: 'Mật khẩu',
                 hintText: 'Nhập mật khẩu',
               ),
-              SizedBox(height: 4),
-              Align(
-                alignment: Alignment.centerRight,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ResetPasswordScreen(),
-                        ),
-                      );
+              SizedBox(height: 16),
+              Row(
+                children: [
+                  Checkbox(
+                    value: _agreeToTerms,
+                    onChanged: (value) {
+                      setState(() {
+                        _agreeToTerms = value!;
+                      });
                     },
-                    child: Text(
-                      'Quên mật khẩu?',
-                      style: TextStyle(color: Colors.black),
-                    ),
                   ),
-                ),
+                  Text(
+                    'Tôi đồng ý tất cả các điều khoản',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ],
               ),
-              SizedBox(height: 40),
+              SizedBox(height: 30),
               _isLoading
                   ? CircularProgressIndicator()
                   : ElevatedButton(
-                      onPressed: _login,
+                      onPressed: _register,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFFFFE279),
                         minimumSize: Size(double.infinity, 55),
@@ -159,7 +157,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                       ),
                       child: Text(
-                        'Đăng nhập',
+                        'Đăng ký',
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 18,
@@ -180,7 +178,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 ),
                 icon: Image.asset('assets/images/logo_google.png', height: 24),
                 label: Text(
-                  'Đăng nhập với Google',
+                  'Đăng ký với Google',
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 18,
@@ -193,7 +191,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Chưa có tài khoản?',
+                    'Đã có tài khoản?',
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 18,
@@ -201,15 +199,14 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SignUpScreen(),
-                        ),
+                          builder: (context) => SignInScreen()),
                       );
                     },
                     child: Text(
-                      ' Đăng ký ngay',
+                      ' Đăng nhập ngay',
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 18,
@@ -259,8 +256,7 @@ class _SignInScreenState extends State<SignInScreen> {
               borderRadius: BorderRadius.circular(30.0),
               borderSide: BorderSide(color: Colors.white),
             ),
-            contentPadding:
-                EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -318,8 +314,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 },
               ),
             ),
-            contentPadding:
-                EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {

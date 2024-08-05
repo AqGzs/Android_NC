@@ -42,4 +42,23 @@ class OrderService {
       throw Exception('Failed to create order');
     }
   }
+   Future<List<dynamic>> getOrdersByUserId(String userId, String token) async {
+    try {
+      final response = await _dio.get(
+        '/orders/$userId',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            }),
+      );
+      if (response.statusCode == 200) {
+        return response.data;
+      } else {
+        throw Exception('Failed to load orders');
+      }
+    } catch (e) {
+      print(e);
+      throw Exception('Failed to load orders');
+    }
+  }
 }

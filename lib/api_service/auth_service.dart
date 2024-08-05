@@ -25,7 +25,7 @@ class AuthService {
     }
   }
 
-  Future<User> register(User user) async {
+    Future<User> register(User user) async {
     try {
       final response = await _dio.post(
         '/auth/register',
@@ -36,8 +36,15 @@ class AuthService {
       } else {
         throw Exception('Failed to register');
       }
-    } catch (error) {
-      throw Exception('Failed to register: $error');
+    } on DioException catch (error) {
+      if (error.response?.statusCode == 400) {
+        final errors = (error.response?.data['errors'] as List)
+            .map((e) => e['msg'])
+            .toList();
+        throw Exception(errors.join(', '));
+      } else {
+        throw Exception('Failed to register: ${error.message}');
+      }
     }
   }
 }

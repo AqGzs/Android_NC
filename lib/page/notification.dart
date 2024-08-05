@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_doanlt/notification/notificationItem.dart';
+import 'package:flutter_doanlt/page/notificationitem.dart';
 
 class NotificationScreen extends StatelessWidget {
   final Map<String, List<NotificationItem>> notifications = {

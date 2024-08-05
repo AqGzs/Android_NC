@@ -64,15 +64,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
         ),
-         actions: [
-          IconButton(
-            icon: Icon(Icons.circle_outlined),
-            onPressed: () {
-           
-            },
+             actions: [
+          Padding(
+            padding:
+                const EdgeInsets.only(right: 16.0), // Add padding to the right
+            child: InkWell(
+              onTap: () {}, // Add tap callback
+              splashColor: Color(0xFF6699CC),
+              hoverColor: Color(0xFF6699CC), // Remove splash effect
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Color(0xFF6699CC), // White background
+                  shape: BoxShape.circle, // Circular shape
+                ),
+                padding: const EdgeInsets.all(8.0), // Add padding to the icon
+                
+              ),
+            ),
           ),
         ],
-
       ),
       body: FutureBuilder<User>(
         future: userFuture,

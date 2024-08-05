@@ -178,16 +178,17 @@ class _ProductCardState extends State<ProductCard> {
                     widget.shoe.imageUrl,
                     height: 110,
                     width: double.infinity,
-                    fit: BoxFit.contain,
+                    fit: BoxFit.scaleDown,
                   ),
-                ),
-                Positioned(
-                  right: 12.0,
-                  top: 12.0,
-                  child: FavoriteButton(shoe: widget.shoe),
-                ),
+                ),    
+                 Positioned(
+                  right: 0.0,
+                  top: 0.0,
+                  child: FavoriteButton(shoe: widget.shoe, userId: widget.userId, token: widget.token,),
+                ),  
               ],
             ),
+               
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Row(

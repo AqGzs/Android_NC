@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_doanlt/page/orderhistory.dart';
 import 'package:flutter_doanlt/page/profile_screen.dart';
 import 'package:flutter_doanlt/page/start.dart';
 
@@ -11,9 +12,10 @@ class AccountSettingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false, 
       home: Scaffold(
         backgroundColor: Color(0xFF6699CC),
-     
+
         body: Padding(
           padding: const EdgeInsets.fromLTRB(16, 10, 16, 15),
           child: Column(
@@ -70,10 +72,12 @@ class AccountSettingScreen extends StatelessWidget {
                             Container(
                               margin: EdgeInsets.only(top: 0.0),
                               child: ListTile(
-                                leading: Icon(Icons.file_upload_outlined),
-                                title: Text('Nâng cấp tài khoản'),
+                                leading: Icon(Icons.shopping_cart_checkout),
+                                title: Text('Lịch sử đơn hàng'),
                                 trailing: Icon(Icons.arrow_forward_ios, size: 20),
-                                onTap: () {},
+                                onTap: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context)=> OrderHistoryScreen(userId: userId, token: token,)));
+                                },
                               ),
                             ),
                           ],
