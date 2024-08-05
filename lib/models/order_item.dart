@@ -1,9 +1,10 @@
-import 'package:flutter_doanlt/models/stock.dart';
+import 'shoe.dart';
+import 'stock.dart';
 
 class OrderItem {
   String id;
   String orderId;
-  String shoeId;
+  Shoe shoe;
   Stock stock;
   int quantity;
   double priceShoe;
@@ -11,7 +12,7 @@ class OrderItem {
   OrderItem({
     required this.id,
     required this.orderId,
-    required this.shoeId,
+    required this.shoe,
     required this.stock,
     required this.quantity,
     required this.priceShoe,
@@ -19,20 +20,20 @@ class OrderItem {
 
   factory OrderItem.fromJson(Map<String, dynamic> json) {
     return OrderItem(
-      id: json['_id'],
-      orderId: json['orderId'],
-      shoeId: json['shoeId'] ?? '',
+      id: json['orderItemId'] ?? '',
+      orderId: json['orderId'] ?? '',
+      shoe: Shoe.fromJson(json['productId'] ?? {}),
       stock: Stock.fromJson(json['stock'] ?? {}),
       quantity: json['quantity'] ?? 0,
-      priceShoe: json['priceShoe'] ?? 0,
+      priceShoe: json['priceShoe']?.toDouble() ?? 0.0,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      '_id': id,
+      'orderItemId': id,
       'orderId': orderId,
-      'shoeId': shoeId,
+      'productId': shoe.toJson(),
       'stock': stock.toJson(),
       'quantity': quantity,
       'priceShoe': priceShoe,

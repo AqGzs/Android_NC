@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_doanlt/page/home/trangchu.dart';
+import 'package:flutter_doanlt/api_service/dio_config.dart';
+import 'package:flutter_doanlt/page/home/home_page.dart';
 import 'package:flutter_doanlt/api_service/cart_service.dart';
 import 'package:flutter_doanlt/api_service/user_service.dart';
 import 'package:flutter_doanlt/models/user.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_doanlt/utility/format_price.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class CheckoutScreen extends StatefulWidget {
@@ -30,19 +31,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final CartService cartService = CartService();
   final UserService userService = UserService();
   late Future<User> userFuture;
-  String selectedPaymentMethod = 'Thẻ Paypal';
+  String selectedPaymentMethod = 'Paypal';
   String? apiurl;
-  final Dio _dio = Dio();
-
-   String formatPrice(double price) {
-    final NumberFormat formatter = NumberFormat('#,###');
-    return formatter.format(price).replaceAll(',', '.') + ' ' + 'VNĐ';
-  }
+  final Dio _dio = DioConfig.instance;
+  final Dio dio = DioConfig.instance;
+ 
 
   @override
   void initState() {
     super.initState();
-    apiurl = 'https://0378-14-161-49-244.ngrok-free.app';
+    apiurl = 'https://851d-2402-800-62b2-8ed9-9843-7837-1dd-95dd.ngrok-free.app';
     userFuture = _fetchUserDetails();
   }
 
@@ -50,29 +48,36 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return await userService.getUserDetails(widget.userId, widget.token);
   }
 
-  Future<void> saveOrder() async {
-    try {
-      final response = await _dio.post(
-        '/order',
-        data: {
-          'userId': widget.userId,
-          'cartItems': widget.cartItems,
-          'totalAmount': widget.totalAmount,
+Future<void> saveOrder() async {
+  try {
+    final response = await dio.post(
+      '/orders', // Thay đổi thành URL API của bạn
+      data: {
+        'userId': widget.userId,
+        'items': widget.cartItems,
+        'total': widget.totalAmount - discount,
+        'paymentMethod': selectedPaymentMethod, 
+      },
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer ${widget.token}', // Thêm token để xác thực
+          'Content-Type': 'application/json; charset=UTF-8',
         },
-        options: Options(
-          headers: {'Content-Type': 'application/json; charset=UTF-8'},
-        ),
-      );
+      ),
+    );
 
-      if (response.statusCode == 201) {
-        print('Order saved successfully');
-      } else {
-        print('Failed to save order');
-      }
-    } catch (e) {
-      print('Error: $e');
+    if (response.statusCode == 201) {
+      print('Order saved successfully');
+      _showPaymentSuccessDialog(context); // Hiển thị thông báo thanh toán thành công
+    } else {
+      print('Failed to save order');
+      _showOrderFailedDialog(context); // Hiển thị thông báo lỗi
     }
+  } catch (e) {
+    print('Error: $e');
+    _showOrderFailedDialog(context); // Hiển thị thông báo lỗi
   }
+}
 
 
   Future<void> _initiatePayment(String appUser) async {
@@ -95,7 +100,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         if (paymentUrl != null) {
           await _launchURL(paymentUrl);
           await Future.delayed(Duration(seconds: 2)); // Adjust the delay as needed
-          _showPaymentSuccessDialog(context);
         } else {
           print('Payment URL not found in response');
         }
@@ -110,11 +114,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Future<void> _launchURL(String url) async {
     final encodedUrl = Uri.encodeFull(url); // Ensure the URL is properly encoded
     print('Attempting to launch URL: $encodedUrl'); // Debug information
-    try {   
-        final launched = await launchUrlString(encodedUrl, mode: LaunchMode.externalApplication);
-        if (!launched) {
-          // Try another mode if the first one fails
-          await launchUrlString(encodedUrl, mode: LaunchMode.platformDefault);
+    try {
+      final launched = await launchUrlString(encodedUrl, mode: LaunchMode.externalApplication);
+      if (!launched) {
+        // Try another mode if the first one fails
+        await launchUrlString(encodedUrl, mode: LaunchMode.platformDefault);
         print('Launched URL: $encodedUrl'); // Debug information
       } else {
         print('Could not launch $encodedUrl');
@@ -231,18 +235,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                  'Tổng tiền hàng', style: TextStyle(fontSize: 18)),
-                  Text(
-                      formatPrice(widget.totalAmount), style: TextStyle(fontSize: 18)),
+                  Text('Tổng tiền hàng', style: TextStyle(fontSize: 18)),
+                  Text(formatPrice(widget.totalAmount), style: TextStyle(fontSize: 18)),
                 ],
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('Chiết khấu', style: TextStyle(fontSize: 18)),
-                 Text(
-                   formatPrice(discount ), style: TextStyle(fontSize: 18)),
+                  Text(formatPrice(discount), style: TextStyle(fontSize: 18)),
                 ],
               ),
               Divider(),
@@ -251,18 +252,25 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 children: [
                   Text('Tổng thanh toán',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  Text(
-                    formatPrice(finalAmount),
+                  Text(formatPrice(finalAmount),
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 ],
               ),
               SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () async {
-                  if (selectedPaymentMethod == 'Zalo Pay') {
-                    await _initiatePayment(widget.userId);
+                  if (user.address == null || user.address!.isEmpty) {
+                    _showMissingAddressDialog(context);
                   } else {
-                    _showNotImplementedDialog(context);
+                    // Lưu đơn hàng trước khi thanh toán
+                  await saveOrder();
+
+                    if (selectedPaymentMethod == 'ZaloPay') {
+                       
+                      await _initiatePayment(widget.userId);
+                    } else {
+                      _showNotImplementedDialog(context);
+                    }
                   }
                 },
                 child: Text('Thanh toán',
@@ -275,7 +283,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-              ),
+              )
+
             ],
           ),
         ),
@@ -350,12 +359,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   Widget _buildPaymentMethod(User user) {
-    List<String> paymentMethods = ['Thẻ Paypal', 'Zalo Pay', 'Cash on Delivery'];
+    List<String> paymentMethods = ['Paypal', 'ZaloPay', 'COD'];
 
     Map<String, String> paymentMethodLogos = {
-      'Thẻ Paypal': 'assets/images/paypal_logo.jpg',
-      'Zalo Pay': 'assets/images/zalo_pay.jpg',
-      'Cash on Delivery': 'assets/images/cod_logo.jpg',
+      'Paypal': 'assets/images/paypal_logo.jpg',
+      'ZaloPay': 'assets/images/zalo_pay.jpg',
+      'COD': 'assets/images/cod_logo.jpg',
     };
 
     return Container(
@@ -451,7 +460,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       ),
     );
   }
-  
+
   void _showPaymentSuccessDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -502,4 +511,43 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       },
     );
   }
+
+  void _showMissingAddressDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Lỗi'),
+          content: Text('Vui lòng nhập địa chỉ để tiếp tục.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  void _showOrderFailedDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Lỗi'),
+        content: Text('Không thể tạo đơn hàng. Vui lòng thử lại sau.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('OK'),
+          ),
+        ],
+      );
+    },
+  );
+}
 }

@@ -55,12 +55,13 @@ class CartService {
           final product = item['productId'];
           final stock = item['stock'];
           return {
+            'cartId': item['cartId'],
             'productId': product['_id'],
             'quantity': item['quantity'],
-            'stockId': stock['id'],
+            'stockId': stock['_id'],
             'title': product['name'],
             'image': product['imageUrl'],
-            'price':  product.price,
+            'price': product['price'],
             'size': stock['size'],
           };
         }).toList();
@@ -71,6 +72,7 @@ class CartService {
       throw Exception('Failed to load cart items');
     }
   }
+
 
      Future<Order> checkout(String userId) async {
     try {

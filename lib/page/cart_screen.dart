@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_doanlt/api_service/cart_service.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_doanlt/utility/format_price.dart';
 import 'package:provider/provider.dart';
 import 'cart_item.dart';
 import 'checkout_screen.dart';
@@ -19,10 +19,7 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   final CartService cartService = CartService();
 
-  String formatPrice(double price) {
-    final NumberFormat formatter = NumberFormat('#,###');
-    return formatter.format(price).replaceAll(',', '.') + ' ' + 'VNĐ';
-  }
+ 
 
   void _increaseQuantity(Map<String, dynamic> item) {
     setState(() {

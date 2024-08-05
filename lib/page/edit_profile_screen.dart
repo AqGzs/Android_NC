@@ -4,6 +4,7 @@ import 'package:flutter_doanlt/models/user.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
+// ignore: must_be_immutable
 class EditProfileScreen extends StatefulWidget {
   final String token;
   final String userId;
@@ -181,11 +182,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               hoverColor: Color(0xFF6699CC),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color:Color(0xFF6699CC),
                   shape: BoxShape.circle,
                 ),
                 padding: const EdgeInsets.all(8.0),
-                child: Icon(Icons.edit, color: Colors.black),
+        
               ),
             ),
           ),

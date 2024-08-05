@@ -1,12 +1,12 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_doanlt/api_service/shoe_service.dart';
-import 'package:flutter_doanlt/favorite/favorite.dart';
+import 'package:flutter_doanlt/page/favorite.dart';
 import 'package:flutter_doanlt/models/shoe.dart';
-import 'package:flutter_doanlt/notification/notification.dart';
+import 'package:flutter_doanlt/page/home/product_card.dart';
+import 'package:flutter_doanlt/page/notification.dart';
 import 'package:flutter_doanlt/page/account_setting_screen.dart';
 import 'package:flutter_doanlt/page/home/category_button.dart';
-import 'package:flutter_doanlt/page/home/product_card1.dart';
 import 'package:flutter_doanlt/page/productDetailScreen.dart';
 import 'package:flutter_doanlt/page/product_list/product_list_screen.dart';
 import 'package:flutter_doanlt/page/search.dart';
@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _screens = [
       HomePageContent(token: widget.token, userId: widget.userId),
-      FavoriteScreen(),
+      FavoriteScreen(token: widget.token, userId:  widget.userId,),
       NotificationScreen(),
       AccountSettingScreen(token: widget.token, userId: widget.userId),
     ];
@@ -285,41 +285,12 @@ class _HomePageContentState extends State<HomePageContent> {
                                   ? SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: Row(
-                                        children: shoes.map((shoe) => ProductCard1(shoe: shoe, token: widget.token, userId: widget.userId,)).toList(),
+                                        children: shoes.map((shoe) => HomePageCard(shoe: shoe, token: widget.token, userId: widget.userId,)).toList(),
                                       ),
                                     )
                                   : Center(child: Text('Không tìm thấy sản phẩm')),
                             ),
-                            SizedBox(height: 24.0),
-                            Divider(color: Colors.black54),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                              child: SectionTitle(
-                                title: 'Sản Phẩm Mới',
-                                token: widget.token,
-                                userId: widget.userId,
-                                onViewAll: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ProductDetailScreen(shoe: shoes.first, token: widget.token, userId: widget.userId,), // Assuming you pass a shoe
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            SizedBox(height: 10.0),
-                            Container(
-                              color: Color(0xFF6699CC),
-                              child: shoes.isNotEmpty
-                                  ? SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Row(
-                                        children: shoes.map((shoe) => ProductCard1(shoe: shoe, token: widget.token, userId: widget.userId,)).toList(),
-                                      ),
-                                    )
-                                  : Center(child: Text('Không tìm thấy sản phẩm')),
-                            ),
+                            SizedBox(height: 24.0),                    
                           ],
                         ),
                       ),

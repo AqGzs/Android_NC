@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_doanlt/api_service/cart_service.dart';
-import 'package:flutter_doanlt/api_service/shoe_service.dart';
 import 'package:flutter_doanlt/models/shoe.dart';
 import 'package:flutter_doanlt/models/stock.dart';
 import 'package:flutter_doanlt/page/cart_screen.dart';
 import 'package:flutter_doanlt/provider/cart_provider.dart';
+import 'package:flutter_doanlt/utility/format_price.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -38,10 +38,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   }
 
-  String formatPrice(double price) {
-    final NumberFormat formatter = NumberFormat('#,###');
-    return formatter.format(price).replaceAll(',', '.') + ' ' +'VNĐ';
-  }
+ 
 Future<void> _addToCart(Shoe shoe, Stock stock, int quantity) async {
   Provider.of<CartProvider>(context, listen: false).addToCart(shoe, stock, quantity);
 

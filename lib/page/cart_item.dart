@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_doanlt/utility/format_price.dart';
 
 class CartItem extends StatelessWidget {
   final Map<String, dynamic> item;
@@ -16,11 +16,7 @@ class CartItem extends StatelessWidget {
     required this.onQuantityChanged,
   });
 
- String formatPrice(double price) {
-    final NumberFormat formatter = NumberFormat('#,###');
-    return formatter.format(price).replaceAll(',', '.') + ' ' + 'VNĐ';
-  }
-
+ 
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -68,11 +64,16 @@ class CartItem extends StatelessWidget {
                   style: TextStyle(fontSize: 16, color: Colors.grey),
                   overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(height: 5),
-                Text(
-                  'Size: ${item['size'] ?? 'N/A'}',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                ),
+                // SizedBox(height: 5),
+                // Text(
+                //   'Color: ${item['colors'] ?? 'N/A'}',
+                //   style: TextStyle(fontSize: 16, color: Colors.grey),
+                // ),
+                 SizedBox(height: 5),
+                  Text(
+                    'Size: ${item['size'] ?? 'N/A'}',
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
               ],
             ),
           ),
