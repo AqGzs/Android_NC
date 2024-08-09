@@ -72,14 +72,7 @@ class HomePageCard extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 4.0),
-                    Text(
-                      'Deep Foam',
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12.0,
-                      ),
-                    ),
+ 
                     SizedBox(height: 8.0),
                     Text(
                       formatPrice(shoe.price),

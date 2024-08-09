@@ -5,13 +5,15 @@ import 'package:flutter_doanlt/models/shoe.dart';
 class ShoeService {
   final Dio _dio = DioConfig.instance;
 
-  Future<List<Shoe>> getShoes({int? size, int? minPrice, int? maxPrice}) async {
+  Future<List<Shoe>> getShoes({String brand= ''}) async {
     try {
-      final response = await _dio.get('/shoes', queryParameters: {
-        'size': size,
-        'minPrice': minPrice,
-        'maxPrice': maxPrice,
-      });
+     String url = brand.isEmpty
+          ? '/shoes'  // URL để lấy tất cả sản phẩm
+          : '/shoes/brand/$brand';  // URL để lọc theo danh mục
+
+      final response = await _dio.get(
+        url,
+      );
       print('Response status: ${response.statusCode}');
       print('Response data: ${response.data}');
       if (response.statusCode == 200) {
@@ -37,7 +39,8 @@ class ShoeService {
       throw Exception('Failed to load shoes: $error');
     }
   }
-
+ 
+  
   Future<Shoe> createShoe(Shoe shoe) async {
     try {
       final response = await _dio.post(

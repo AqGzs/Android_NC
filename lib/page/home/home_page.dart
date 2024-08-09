@@ -1,6 +1,8 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_doanlt/api_service/category_service.dart';
 import 'package:flutter_doanlt/api_service/shoe_service.dart';
+import 'package:flutter_doanlt/models/category.dart';
 import 'package:flutter_doanlt/page/favorite.dart';
 import 'package:flutter_doanlt/models/shoe.dart';
 import 'package:flutter_doanlt/page/home/product_card.dart';
@@ -112,28 +114,49 @@ class HomePageContent extends StatefulWidget {
   @override
   _HomePageContentState createState() => _HomePageContentState();
 }
-
 class _HomePageContentState extends State<HomePageContent> {
   String selectedCategory = '';
   List<Shoe> shoes = [];
+  List<Category> categories = [];
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    _loadCategories(); // Load categories
     _loadProducts();
   }
 
+  Future<void> _loadCategories() async {
+    CategoryService categoryService = CategoryService();
+    try {
+      // Fetch categories từ API
+      List<Category> fetchedCategories = await categoryService.fetchCategories();
+      setState(() {
+        categories = fetchedCategories;
+      });
+    } catch (e) {
+      print('Error loading categories: $e');
+    }
+  }
+
+
   void selectCategory(String category) {
     setState(() {
-      selectedCategory = category;
+      if (selectedCategory == category) {
+        selectedCategory = '';
+      } else {
+        selectedCategory = category;
+      }
+      isLoading = true;
     });
+    _loadProducts();
   }
 
   Future<void> _loadProducts() async {
     ShoeService apiService = ShoeService();
     try {
-      List<Shoe> fetchedShoes = await apiService.getShoes();
+      List<Shoe> fetchedShoes = await apiService.getShoes(brand: selectedCategory);
       setState(() {
         shoes = fetchedShoes;
         isLoading = false;
@@ -149,158 +172,122 @@ class _HomePageContentState extends State<HomePageContent> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Color(0xFF6699CC), // Set the main background color here
+      color: Color(0xFF6699CC),
       child: Padding(
         padding: const EdgeInsets.only(top: 16.0),
         child: isLoading
             ? Center(child: CircularProgressIndicator())
-            : shoes.isNotEmpty
-                ? CustomScrollView(
-                    slivers: [
-                      SliverAppBar(
-                        pinned: true,
-                        backgroundColor: Color(0xFF6699CC),
-                        automaticallyImplyLeading: false,
-                        title: TextField(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => SearchScreen(token: widget.token)),
+            : CustomScrollView(
+                slivers: [
+                  SliverAppBar(
+                    pinned: true,
+                    backgroundColor: Color(0xFF6699CC),
+                    automaticallyImplyLeading: false,
+                    title: TextField(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => SearchScreen(token: widget.token)),
+                        );
+                      },
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.search),
+                        hintText: 'Tìm kiếm',
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(35.0),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 8.0),
+                        CarouselSlider(
+                          options: CarouselOptions(
+                            autoPlay: true,
+                            enlargeCenterPage: true,
+                            viewportFraction: 1.0,
+                            aspectRatio: 16 / 9,
+                          ),
+                          items: [
+                            'assets/images/carousel1.jpg',
+                            'assets/images/carousel2.jpg',
+                            'assets/images/carousel3.jpg',
+                          ].map((imagePath) {
+                            return Builder(
+                              builder: (BuildContext context) {
+                                return ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  child: Image.asset(
+                                    imagePath,
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    height: 220.0,
+                                  ),
+                                );
+                              },
                             );
-                          },
-                          decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.search),
-                            hintText: 'Tìm kiếm',
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(35.0),
-                              borderSide: BorderSide.none,
-                            ),
+                          }).toList(),
+                        ),
+                        SizedBox(height: 24.0),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: categories.map((category) {
+                            return CategoryButton(
+                              iconPath: category.imageUrl,
+                              isSelected: selectedCategory == category.name,
+                              label: category.name,
+                              onTap: () => selectCategory(category.name),
+                            );
+                          }).toList(),
+                        ),
+                        SizedBox(height: 24.0),
+                        Divider(color: Colors.black54),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: SectionTitle(
+                            title: 'Nổi Bật',
+                            token: widget.token,
+                            userId: widget.userId,
+                            onViewAll: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ProductListScreen(userId: widget.userId, token: widget.token),
+                                ),
+                              );
+                            },
                           ),
                         ),
-                      ),
-                      SliverToBoxAdapter(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(height: 8.0), // Add some space between the search bar and the carousel
-                            CarouselSlider(
-                              options: CarouselOptions(
-                                autoPlay: true,
-                                enlargeCenterPage: true,
-                                viewportFraction: 1.0, // Use full width
-                                aspectRatio: 16 / 9,
-                              ),
-                              items: [
-                                'assets/images/carousel1.jpg',
-                                'assets/images/carousel2.jpg',
-                                'assets/images/carousel3.jpg',
-                              ].map((imagePath) {
-                                return Builder(
-                                  builder: (BuildContext context) {
-                                    return ClipRRect(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      child: Image.asset(
-                                        imagePath,
-                                        fit: BoxFit.cover,
-                                        width: double.infinity,
-                                        height: 220.0,
-                                      ),
-                                    );
-                                  },
-                                );
-                              }).toList(),
-                            ),
-                            SizedBox(height: 24.0),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                              child: Text(
-                                'Categories',
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 16.0),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                CategoryButton(
-                                  iconPath: 'assets/images/logo_nike.png',
-                                  isSelected: selectedCategory == 'Nike',
-                                  label: 'Nike',
-                                  onTap: () => selectCategory('Nike'),
-                                ),
-                                CategoryButton(
-                                  iconPath: 'assets/images/logo_puma.png',
-                                  isSelected: selectedCategory == 'Puma',
-                                  label: 'Puma',
-                                  onTap: () => selectCategory('Puma'),
-                                ),
-                                CategoryButton(
-                                  iconPath: 'assets/images/logo_underarmour.png',
-                                  isSelected: selectedCategory == 'Under Armour',
-                                  label: 'Under Armour',
-                                  onTap: () => selectCategory('Under Armour'),
-                                ),
-                                CategoryButton(
-                                  iconPath: 'assets/images/logo_adidas.png',
-                                  isSelected: selectedCategory == 'Adidas',
-                                  label: 'Adidas',
-                                  onTap: () => selectCategory('Adidas'),
-                                ),
-                                CategoryButton(
-                                  iconPath: 'assets/images/logo_converse.png',
-                                  isSelected: selectedCategory == 'Converse',
-                                  label: 'Converse',
-                                  onTap: () => selectCategory('Converse'),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 24.0),
-                            Divider(color: Colors.black54),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                              child: SectionTitle(
-                                title: 'Nổi Bật',
-                                token: widget.token,
-                                userId: widget.userId,
-                                onViewAll: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ProductListScreen(userId: widget.userId, token: widget.token),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            SizedBox(height: 10.0),
-                            Container(
-                              color: Color(0xFF6699CC),
-                              child: shoes.isNotEmpty
-                                  ? SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Row(
-                                        children: shoes.map((shoe) => HomePageCard(shoe: shoe, token: widget.token, userId: widget.userId,)).toList(),
-                                      ),
-                                    )
-                                  : Center(child: Text('Không tìm thấy sản phẩm')),
-                            ),
-                            SizedBox(height: 24.0),                    
-                          ],
+                        SizedBox(height: 10.0),
+                        Container(
+                          color: Color(0xFF6699CC),
+                          child: shoes.isNotEmpty
+                              ? SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    children: shoes.map((shoe) => HomePageCard(shoe: shoe, token: widget.token, userId: widget.userId)).toList(),
+                                  ),
+                                )
+                              : Center(child: Text('Không tìm thấy sản phẩm')),
                         ),
-                      ),
-                    ],
-                  )
-                : Center(child: Text('Không tìm thấy sản phẩm')),
+                        SizedBox(height: 24.0),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
       ),
     );
   }
 }
+
 class SectionTitle extends StatelessWidget {
   final String title;
   final String userId;
