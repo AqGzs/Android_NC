@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 class CategoryButton extends StatelessWidget {
   final String iconPath;
   final bool isSelected;
@@ -23,7 +24,7 @@ class CategoryButton extends StatelessWidget {
             CircleAvatar(
               radius: 30.0,
               backgroundColor: isSelected ? Color(0xFFFEB941) : Color(0xFFFFE279),
-              child: Image.asset(
+              child: Image.network(
                 iconPath,
                 width: 35.0,
                 height: 35.0,
