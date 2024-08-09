@@ -14,11 +14,24 @@ class FilterSheet extends StatefulWidget {
 
 class _FilterSheetState extends State<FilterSheet> {
   RangeValues priceRange = RangeValues(100000, 200000);
+  late double minPrice;
+  late double maxPrice;
   final NumberFormat currencyFormatter = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
+
+  @override
+  void initState() {
+    super.initState();
+    // Thiết lập minPrice và maxPrice dựa trên danh sách giày
+    minPrice = widget.allShoes.map((shoe) => shoe.price).reduce((a, b) => a < b ? a : b).toDouble();
+    maxPrice = widget.allShoes.map((shoe) => shoe.price).reduce((a, b) => a > b ? a : b).toDouble();
+    
+    // Thiết lập phạm vi giá ban đầu dựa trên minPrice và maxPrice
+    priceRange = RangeValues(minPrice, maxPrice);
+  }
 
   void resetFilters() {
     setState(() {
-      priceRange = RangeValues(50000, 350000);
+      priceRange = RangeValues(minPrice, maxPrice);
     });
     widget.onFilterApplied(widget.allShoes);
     Navigator.pop(context);
@@ -29,7 +42,7 @@ class _FilterSheetState extends State<FilterSheet> {
       return shoe.price >= priceRange.start && shoe.price <= priceRange.end;
     }).toList();
 
-    // Sort the filtered shoes by price
+    // Sắp xếp danh sách giày đã lọc theo giá
     filteredShoes.sort((a, b) => a.price.compareTo(b.price));
 
     widget.onFilterApplied(filteredShoes);
@@ -66,9 +79,9 @@ class _FilterSheetState extends State<FilterSheet> {
           RangeSlider(
             activeColor: Color(0xFF6699CC),
             values: priceRange,
-            min: 50000,
-            max: 350000,
-            divisions: 6,
+            min: minPrice,
+            max: maxPrice,
+            divisions: (maxPrice - minPrice).toInt() ~/ 50000, // Chia các phần dựa trên khoảng giá
             labels: RangeLabels(
               currencyFormatter.format(priceRange.start),
               currencyFormatter.format(priceRange.end),
